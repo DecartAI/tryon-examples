@@ -7,11 +7,8 @@ import {
   useDecartRealtime,
   ConnectionStatus,
 } from "@/hooks/useDecartRealtime";
-import {
-  urlToImageBlob,
-  resizeImageBlob,
-  captureVideoFrame,
-} from "@/lib/image-utils";
+import { urlToImageBlob, resizeImageBlob } from "@/lib/image-utils";
+import { enhancePrompt } from "@/lib/enhance-prompt";
 
 interface TryOnModalProps {
   product: Product;
@@ -81,26 +78,9 @@ export function TryOnModal({ product, enhanceEnabled, onClose }: TryOnModalProps
 
       if (enhanceEnabled) {
         setProcessingStatus("Generating try-on prompt...");
-        try {
-          const formData = new FormData();
-          formData.append("image", resized);
-
-          if (localVideoRef.current && localVideoRef.current.videoWidth > 0) {
-            const personFrame = await captureVideoFrame(localVideoRef.current);
-            formData.append("personFrame", personFrame);
-          }
-
-          const enhanceRes = await fetch("/api/enhance-prompt", {
-            method: "POST",
-            body: formData,
-          });
-          const data = await enhanceRes.json();
-          if (data.prompt) {
-            finalPrompt = data.prompt;
-          }
-        } catch {
-          // Fall back to hardcoded prompt
-        }
+        finalPrompt =
+          (await enhancePrompt(resized, localVideoRef.current)) ??
+          product.prompt;
         setProcessingStatus(null);
       }
 

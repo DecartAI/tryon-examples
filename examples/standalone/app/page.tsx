@@ -5,11 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { Product } from "@/lib/products";
 import { useCamera } from "@/hooks/useCamera";
 import { useDecartRealtime } from "@/hooks/useDecartRealtime";
-import {
-  urlToImageBlob,
-  resizeImageBlob,
-  captureVideoFrame,
-} from "@/lib/image-utils";
+import { urlToImageBlob, resizeImageBlob } from "@/lib/image-utils";
+import { enhancePrompt } from "@/lib/enhance-prompt";
 import { ProductSidebar } from "@/components/ProductSidebar";
 import { TryOnView } from "@/components/TryOnView";
 
@@ -86,26 +83,9 @@ export default function StandalonePage() {
 
       if (enhanceEnabled) {
         setProcessingStatus("Generating try-on prompt...");
-        try {
-          const formData = new FormData();
-          formData.append("image", resized);
-
-          if (localVideoRef.current && localVideoRef.current.videoWidth > 0) {
-            const personFrame = await captureVideoFrame(localVideoRef.current);
-            formData.append("personFrame", personFrame);
-          }
-
-          const res = await fetch("/api/enhance-prompt", {
-            method: "POST",
-            body: formData,
-          });
-          const data = await res.json();
-          if (data.prompt) {
-            finalPrompt = data.prompt;
-          }
-        } catch {
-          // Fall back to hardcoded prompt
-        }
+        finalPrompt =
+          (await enhancePrompt(resized, localVideoRef.current)) ??
+          product.prompt;
         setProcessingStatus(null);
       }
 
