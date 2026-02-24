@@ -196,10 +196,7 @@ Your permanent `DECART_API_KEY` never leaves the server. The browser receives a 
 ## Next steps
 
 - [Decart Quickstart](https://docs.platform.decart.ai/getting-started/quickstart) - Get your API key and first result in minutes
-- [Client Tokens](https://docs.platform.decart.ai/getting-started/client-tokens) - Secure browser authentication for production
-- [Lucy 2 Model Guide](https://docs.platform.decart.ai/models/realtime/lucy-2) - Character transformation, text editing, and reference images
 - [JavaScript Realtime SDK](https://docs.platform.decart.ai/sdks/javascript-realtime) - Full WebRTC API reference
-- [Use Cases](https://docs.platform.decart.ai/examples/use-cases) - More patterns: character transformation, live streaming, avatars
 
 ---
 
