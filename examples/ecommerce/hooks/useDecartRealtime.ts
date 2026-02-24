@@ -19,7 +19,7 @@ export type ConnectionStatus =
 interface ConnectOptions {
   apiKey: string;
   stream: MediaStream;
-  prompt: string;
+  prompt?: string;
   onRemoteStream: (stream: MediaStream) => void;
 }
 
@@ -40,9 +40,9 @@ export function useDecartRealtime() {
       const rtClient = await client.realtime.connect(stream, {
         model,
         onRemoteStream,
-        initialState: {
-          prompt: { text: prompt, enhance: false },
-        },
+        ...(prompt && {
+          initialState: { prompt: { text: prompt, enhance: false } },
+        }),
       });
 
       rtClient.on("connectionChange", (state) => {

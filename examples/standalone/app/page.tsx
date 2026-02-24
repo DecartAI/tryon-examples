@@ -38,7 +38,6 @@ export default function StandalonePage() {
       await connect({
         apiKey,
         stream: mediaStream,
-        prompt: "Show person as is",
         onRemoteStream: (remoteStream) => {
           if (remoteVideoRef.current?.current) {
             remoteVideoRef.current.current.srcObject = remoteStream;

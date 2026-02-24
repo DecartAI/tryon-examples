@@ -74,9 +74,6 @@ const rtClient = await client.realtime.connect(stream, {
     // Attach the AI-transformed video to a <video> element
     document.getElementById("output").srcObject = remoteStream;
   },
-  initialState: {
-    prompt: { text: "Show person as is", enhance: false },
-  },
 });
 ```
 
