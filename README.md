@@ -1,6 +1,6 @@
 # Decart Virtual Try-On Examples
 
-Virtual try-on lets shoppers see how clothing looks on them in real time, using just a webcam. Decart's `lucy_2_rt` model takes a live camera feed and a garment reference image, then streams back video of the person wearing that garment — all through a WebRTC connection with no server-side rendering. This repo provides drop-in examples so you can add try-on to your own app in minutes.
+Virtual try-on lets shoppers see how clothing looks on them in real time, using just a webcam. Decart's `lucy_2_rt` model takes a live camera feed and a garment reference image, then streams back video of the person wearing that garment - all through a WebRTC connection with no server-side rendering. This repo provides drop-in examples so you can add try-on to your own app in minutes.
 
 Two production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
 
