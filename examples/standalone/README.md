@@ -4,6 +4,8 @@
 
 The camera connects automatically on page load. Users click garments from a sidebar to see themselves wearing each item in real-time.
 
+![Standalone example](screenshot.png)
+
 ---
 
 ## Quick start

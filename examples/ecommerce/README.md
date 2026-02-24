@@ -4,6 +4,8 @@
 
 Users browse a product grid, click "Try On", and see themselves wearing the garment in real-time through their camera.
 
+![E-commerce example](screenshot.png)
+
 ---
 
 ## Quick start
