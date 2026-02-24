@@ -1,8 +1,8 @@
-# Standalone Virtual Try-On
+# Standalone Virtual Try-On (with AI-generated prompts)
 
-> A dedicated try-on experience - products on the left, live camera in the center. Click a product to try it on.
+> A dedicated try-on experience with AI-generated prompts. Products on the left, live camera in the center. Click a product and GPT-4o-mini generates the try-on prompt automatically from the garment image and the person's camera frame.
 
-The camera connects automatically on page load. Users click garments from a sidebar to see themselves wearing each item in real-time.
+Unlike the [e-commerce example](../ecommerce/) which uses hardcoded prompts, this example shows how to use the `/api/enhance-prompt` endpoint to generate prompts dynamically - useful when you don't know what garments users will upload.
 
 ![Standalone example](screenshot.png)
 
@@ -17,19 +17,20 @@ cd examples/standalone
 npm install
 ```
 
-### 2. Set your API key
+### 2. Set your API keys
 
 ```bash
 cp .env.example .env.local
 ```
 
-Open `.env.local` and add your Decart API key:
+Open `.env.local` and add both keys:
 
 ```env
 DECART_API_KEY=sk_your_key_here
+OPENAI_API_KEY=sk_your_openai_key_here
 ```
 
-> **Tip:** Get your API key from [platform.decart.ai](https://platform.decart.ai). See the [Authentication guide](https://docs.platform.decart.ai/getting-started/authentication) for details.
+> **Note:** This example requires both keys. The Decart key powers the realtime try-on, and the OpenAI key powers the prompt generation.
 
 ### 3. Start the dev server
 
@@ -37,7 +38,7 @@ DECART_API_KEY=sk_your_key_here
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Your camera will start automatically. Click any product from the left sidebar to try it on.
+Open [http://localhost:3000](http://localhost:3000). Your camera will start automatically. Click any product to try it on - the prompt is generated automatically.
 
 ---
 
@@ -50,25 +51,35 @@ Page loads
       → Connect to Decart's lucy_2_rt model (WebRTC)
         → User sees themselves in the live video feed
           → User clicks a product
+            → Capture a frame from the camera
+            → Send garment image + person frame to /api/enhance-prompt
+            → GPT-4o-mini generates a try-on prompt
             → setImage(garment, prompt) sends the garment to the model
               → AI video stream shows the user wearing the garment
-                → Click another product to switch instantly
 ```
 
-When a product is clicked, it calls `setImage()` with the garment:
+When a product is clicked, it generates a prompt and then applies the garment:
 
 ```typescript
 const handleSelectProduct = async (product: Product) => {
-  // Load and resize the garment image
   const blob = await urlToImageBlob(product.image);
   const resized = await resizeImageBlob(blob);
 
-  // Apply the garment - no reconnection needed
+  // Generate a prompt from the garment image + person camera frame
+  const prompt = await enhancePrompt(resized, localVideoRef.current);
+
+  // Apply the garment
   clientRef.current.setImage(resized, {
-    prompt: product.prompt,
+    prompt: prompt || "Try on this garment",
     enhance: false,
   });
 };
+```
+
+The `enhancePrompt` helper (`lib/enhance-prompt.ts`) sends the garment image and a camera frame to `/api/enhance-prompt`, which uses GPT-4o-mini to generate a descriptive prompt like:
+
+```
+"Substitute the grey crewneck sweater with a blue and pink flame print hoodie with a kangaroo pocket and oversized fit"
 ```
 
 ---
@@ -77,46 +88,27 @@ const handleSelectProduct = async (product: Product) => {
 
 ### Add your own products
 
-Edit `lib/products.ts`. Each product needs a name, image path, prompt, and price:
+Edit `lib/products.ts`. Each product just needs a name, image path, and price - no prompt required:
 
 ```typescript
 {
   name: "Striped Polo",
   image: "/products/striped-polo.jpg",
-  prompt: "Substitute the current top with a navy and white striped polo shirt with a slim fit",
   price: 45,
 }
 ```
 
 Place the garment image in `public/products/`. Use a clean image of just the garment on a white background for best results.
 
-### Use enhance-prompt for user-uploaded images
-
-If your app accepts user-uploaded garment images, use the enhance-prompt API instead of hardcoded prompts:
-
-```typescript
-const formData = new FormData();
-formData.append("image", userUploadedFile);
-
-const res = await fetch("/api/enhance-prompt", {
-  method: "POST",
-  body: formData,
-});
-const { prompt } = await res.json();
-
-// Use the generated prompt with setImage()
-clientRef.current.setImage(resizedBlob, { prompt, enhance: false });
-```
-
-Requires `OPENAI_API_KEY` in `.env.local`.
-
 ### Adapt to your stack
 
 This example uses Next.js + Tailwind, but the core Decart integration works with any React framework. The key files to port:
 
 1. **`app/api/tokens/route.ts`** - adapt to your backend (Express, Fastify, etc.)
-2. **`hooks/useDecartRealtime.ts`** - works in any React app as-is
-3. **`hooks/useCamera.ts`** - works in any React app as-is
+2. **`app/api/enhance-prompt/route.ts`** - adapt to your backend
+3. **`hooks/useDecartRealtime.ts`** - works in any React app as-is
+4. **`hooks/useCamera.ts`** - works in any React app as-is
+5. **`lib/enhance-prompt.ts`** - works in any React app as-is
 
 ---
 
@@ -125,4 +117,4 @@ This example uses Next.js + Tailwind, but the core Decart integration works with
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime connections |
-| `OPENAI_API_KEY` | No | Powers `/api/enhance-prompt` for auto-generating prompts |
+| `OPENAI_API_KEY` | Yes | Powers `/api/enhance-prompt` for auto-generating prompts |

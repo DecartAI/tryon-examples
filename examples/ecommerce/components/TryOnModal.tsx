@@ -8,11 +8,9 @@ import {
   ConnectionStatus,
 } from "@/hooks/useDecartRealtime";
 import { urlToImageBlob, resizeImageBlob } from "@/lib/image-utils";
-import { enhancePrompt } from "@/lib/enhance-prompt";
 
 interface TryOnModalProps {
   product: Product;
-  enhanceEnabled?: boolean;
   onClose: () => void;
 }
 
@@ -26,15 +24,13 @@ const STATUS_LABELS: Record<ConnectionStatus, string> = {
   error: "Connection error",
 };
 
-export function TryOnModal({ product, enhanceEnabled, onClose }: TryOnModalProps) {
+export function TryOnModal({ product, onClose }: TryOnModalProps) {
   const { error: camError, startCamera, stopCamera } = useCamera();
   const { status, error: rtError, connect, disconnect, clientRef } =
     useDecartRealtime();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const [prompt, setPrompt] = useState(product.prompt);
   const [showPrompt, setShowPrompt] = useState(false);
-  const [processingStatus, setProcessingStatus] = useState<string | null>(null);
   const garmentBlobRef = useRef<Blob | null>(null);
 
   const handleRemoteStream = useCallback((remoteStream: MediaStream) => {
@@ -49,14 +45,6 @@ export function TryOnModal({ product, enhanceEnabled, onClose }: TryOnModalProps
     async function init() {
       const mediaStream = await startCamera();
       if (!mediaStream || cancelled) return;
-
-      // Create a hidden video to capture person frames from
-      const localVideo = document.createElement("video");
-      localVideo.srcObject = mediaStream;
-      localVideo.muted = true;
-      localVideo.playsInline = true;
-      localVideo.play();
-      localVideoRef.current = localVideo;
 
       const res = await fetch("/api/tokens", { method: "POST" });
       const { apiKey } = await res.json();
@@ -73,21 +61,8 @@ export function TryOnModal({ product, enhanceEnabled, onClose }: TryOnModalProps
       const blob = await urlToImageBlob(product.image);
       const resized = await resizeImageBlob(blob);
       garmentBlobRef.current = resized;
-
-      let finalPrompt = product.prompt;
-
-      if (enhanceEnabled) {
-        setProcessingStatus("Generating try-on prompt...");
-        finalPrompt =
-          (await enhancePrompt(resized, localVideoRef.current)) ??
-          product.prompt;
-        setProcessingStatus(null);
-      }
-
-      if (cancelled) return;
-      setPrompt(finalPrompt);
       rtClient.setImage(resized, {
-        prompt: finalPrompt,
+        prompt: product.prompt,
         enhance: false,
       });
     }
@@ -101,7 +76,6 @@ export function TryOnModal({ product, enhanceEnabled, onClose }: TryOnModalProps
     };
   }, [
     product,
-    enhanceEnabled,
     startCamera,
     stopCamera,
     connect,
@@ -159,13 +133,7 @@ export function TryOnModal({ product, enhanceEnabled, onClose }: TryOnModalProps
             className="w-full h-full object-cover"
             style={{ transform: "scaleX(-1)" }}
           />
-          {processingStatus && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/50 backdrop-blur-sm z-20">
-              <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-              <p className="text-white/80 text-sm font-medium">{processingStatus}</p>
-            </div>
-          )}
-          {status === "generating" && !processingStatus && (
+          {status === "generating" && (
             <div className="absolute top-3 right-3 flex items-center gap-2 bg-green-500/90 text-white text-xs font-medium px-3 py-1.5 rounded-full">
               <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
               Live

@@ -50,27 +50,6 @@ export async function resizeImageBlob(
   });
 }
 
-export function captureVideoFrame(
-  video: HTMLVideoElement,
-  maxSize = 320
-): Promise<Blob> {
-  const { videoWidth: w, videoHeight: h } = video;
-  const scale = maxSize / Math.max(w, h);
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(w * scale);
-  canvas.height = Math.round(h * scale);
-  const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("Failed to capture frame"))),
-      "image/jpeg",
-      0.7
-    );
-  });
-}
-
 export function loadImage(blob: Blob): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();

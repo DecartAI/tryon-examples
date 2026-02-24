@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import { Product } from "@/lib/products";
 import { useCamera } from "@/hooks/useCamera";
 import { useDecartRealtime } from "@/hooks/useDecartRealtime";
@@ -11,9 +10,6 @@ import { ProductSidebar } from "@/components/ProductSidebar";
 import { TryOnView } from "@/components/TryOnView";
 
 export default function StandalonePage() {
-  const searchParams = useSearchParams();
-  const enhanceEnabled = searchParams.get("enhance") === "true";
-
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
   const [prompt, setPrompt] = useState("");
   const [processingStatus, setProcessingStatus] = useState<string | null>(null);
@@ -79,23 +75,22 @@ export default function StandalonePage() {
       const resized = await resizeImageBlob(blob);
       garmentBlobRef.current = resized;
 
-      let finalPrompt = product.prompt;
+      // Generate a prompt from the garment image + person camera frame
+      setProcessingStatus("Generating try-on prompt...");
+      const generatedPrompt = await enhancePrompt(
+        resized,
+        localVideoRef.current
+      );
+      setProcessingStatus(null);
 
-      if (enhanceEnabled) {
-        setProcessingStatus("Generating try-on prompt...");
-        finalPrompt =
-          (await enhancePrompt(resized, localVideoRef.current)) ??
-          product.prompt;
-        setProcessingStatus(null);
-      }
-
+      const finalPrompt = generatedPrompt || "Try on this garment";
       setPrompt(finalPrompt);
       clientRef.current.setImage(resized, {
         prompt: finalPrompt,
         enhance: false,
       });
     },
-    [clientRef, enhanceEnabled]
+    [clientRef]
   );
 
   const handlePromptSubmit = useCallback(() => {
