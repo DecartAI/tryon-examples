@@ -7,7 +7,11 @@ import {
   useDecartRealtime,
   ConnectionStatus,
 } from "@/hooks/useDecartRealtime";
-import { urlToImageBlob, resizeImageBlob } from "@/lib/image-utils";
+import {
+  urlToImageBlob,
+  resizeImageBlob,
+  captureVideoFrame,
+} from "@/lib/image-utils";
 
 interface TryOnModalProps {
   product: Product;
@@ -30,6 +34,7 @@ export function TryOnModal({ product, enhanceEnabled, onClose }: TryOnModalProps
   const { status, error: rtError, connect, disconnect, clientRef } =
     useDecartRealtime();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const [prompt, setPrompt] = useState(product.prompt);
   const [showPrompt, setShowPrompt] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<string | null>(null);
@@ -47,6 +52,14 @@ export function TryOnModal({ product, enhanceEnabled, onClose }: TryOnModalProps
     async function init() {
       const mediaStream = await startCamera();
       if (!mediaStream || cancelled) return;
+
+      // Create a hidden video to capture person frames from
+      const localVideo = document.createElement("video");
+      localVideo.srcObject = mediaStream;
+      localVideo.muted = true;
+      localVideo.playsInline = true;
+      localVideo.play();
+      localVideoRef.current = localVideo;
 
       const res = await fetch("/api/tokens", { method: "POST" });
       const { apiKey } = await res.json();
@@ -71,6 +84,12 @@ export function TryOnModal({ product, enhanceEnabled, onClose }: TryOnModalProps
         try {
           const formData = new FormData();
           formData.append("image", resized);
+
+          if (localVideoRef.current && localVideoRef.current.videoWidth > 0) {
+            const personFrame = await captureVideoFrame(localVideoRef.current);
+            formData.append("personFrame", personFrame);
+          }
+
           const enhanceRes = await fetch("/api/enhance-prompt", {
             method: "POST",
             body: formData,

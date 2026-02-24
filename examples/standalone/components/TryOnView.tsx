@@ -12,6 +12,7 @@ interface TryOnViewProps {
   onPromptChange: (prompt: string) => void;
   onPromptSubmit: () => void;
   onRemoteStream: (ref: React.RefObject<HTMLVideoElement | null>) => void;
+  onLocalVideo?: (ref: React.RefObject<HTMLVideoElement | null>) => void;
 }
 
 const STATUS_LABELS: Record<ConnectionStatus, string> = {
@@ -33,6 +34,7 @@ export function TryOnView({
   onPromptChange,
   onPromptSubmit,
   onRemoteStream,
+  onLocalVideo,
 }: TryOnViewProps) {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -46,6 +48,10 @@ export function TryOnView({
   useEffect(() => {
     onRemoteStream(remoteVideoRef);
   }, [onRemoteStream]);
+
+  useEffect(() => {
+    onLocalVideo?.(localVideoRef);
+  }, [onLocalVideo]);
 
   const isGenerating = status === "generating";
 

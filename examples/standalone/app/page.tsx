@@ -5,7 +5,11 @@ import { useSearchParams } from "next/navigation";
 import { Product } from "@/lib/products";
 import { useCamera } from "@/hooks/useCamera";
 import { useDecartRealtime } from "@/hooks/useDecartRealtime";
-import { urlToImageBlob, resizeImageBlob } from "@/lib/image-utils";
+import {
+  urlToImageBlob,
+  resizeImageBlob,
+  captureVideoFrame,
+} from "@/lib/image-utils";
 import { ProductSidebar } from "@/components/ProductSidebar";
 import { TryOnView } from "@/components/TryOnView";
 
@@ -20,11 +24,19 @@ export default function StandalonePage() {
   const { status, error, connect, disconnect, clientRef } =
     useDecartRealtime();
   const remoteVideoRef = useRef<React.RefObject<HTMLVideoElement | null>>(null);
+  const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const garmentBlobRef = useRef<Blob | null>(null);
 
   const handleRemoteStreamRef = useCallback(
     (ref: React.RefObject<HTMLVideoElement | null>) => {
       remoteVideoRef.current = ref;
+    },
+    []
+  );
+
+  const handleLocalVideoRef = useCallback(
+    (ref: React.RefObject<HTMLVideoElement | null>) => {
+      localVideoRef.current = ref.current;
     },
     []
   );
@@ -77,6 +89,12 @@ export default function StandalonePage() {
         try {
           const formData = new FormData();
           formData.append("image", resized);
+
+          if (localVideoRef.current && localVideoRef.current.videoWidth > 0) {
+            const personFrame = await captureVideoFrame(localVideoRef.current);
+            formData.append("personFrame", personFrame);
+          }
+
           const res = await fetch("/api/enhance-prompt", {
             method: "POST",
             body: formData,
@@ -123,6 +141,7 @@ export default function StandalonePage() {
         onPromptChange={setPrompt}
         onPromptSubmit={handlePromptSubmit}
         onRemoteStream={handleRemoteStreamRef}
+        onLocalVideo={handleLocalVideoRef}
       />
     </div>
   );
