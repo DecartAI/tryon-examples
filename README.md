@@ -130,7 +130,7 @@ The model works best with structured prompts that follow a **substitute** or **a
 - **White or clean backgrounds** are ideal
 - **At least 512x512 pixels** - the model reproduces what it sees, so clear garment = better results
 
-### Enhance prompt (optional)
+### Manual enhance prompt (optional)
 
 For user-uploaded garment images where you don't have a pre-written prompt, use GPT-4o-mini to auto-generate one. Both examples include an optional `/api/enhance-prompt` endpoint:
 
