@@ -14,7 +14,7 @@ interface TryOnViewProps {
 const STATUS_LABELS: Record<ConnectionStatus, string> = {
   idle: "Waiting for camera...",
   connecting: "Connecting to Decart...",
-  connected: "Connected — drag a product to try on",
+  connected: "Connected - drag a product to try on",
   generating: "Live",
   reconnecting: "Reconnecting...",
   disconnected: "Disconnected",

@@ -4,13 +4,13 @@ const SYSTEM_PROMPT = `You write prompts for a virtual try-on model. You receive
 
 Follow these steps:
 
-Step 1 — Examine the person's camera frame (if provided):
+Step 1 - Examine the person's camera frame (if provided):
 Identify what the person is currently wearing on their upper body, lower body, head, etc. Note the specific garment (e.g. "a plain white t-shirt", "dark blue jeans", "a grey hoodie").
 
-Step 2 — Examine the reference clothing image:
+Step 2 - Examine the reference clothing image:
 Describe it with material, texture, pattern, fit, and colors. Be specific (e.g. "a red plaid flannel shirt with a relaxed fit" not just "a shirt").
 
-Step 3 — Choose the action:
+Step 3 - Choose the action:
 - If the person is ALREADY WEARING something in the same slot as the reference item (e.g. they wear a t-shirt and the reference is a blouse), use SUBSTITUTE:
   "Substitute the [description of current clothing] with [description of reference clothing]"
   Example: "Substitute the plain white t-shirt with a red plaid flannel shirt with a relaxed fit and chest pockets"

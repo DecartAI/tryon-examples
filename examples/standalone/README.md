@@ -1,6 +1,6 @@
 # Standalone Virtual Try-On
 
-> A dedicated try-on experience — products on the left, live camera in the center. Drag a product onto the video to try it on.
+> A dedicated try-on experience - products on the left, live camera in the center. Drag a product onto the video to try it on.
 
 The camera connects automatically on page load. Users drag garments from a sidebar onto the live video to see themselves wearing each item in real-time.
 
@@ -64,7 +64,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
   const blob = await urlToImageBlob(product.image);
   const resized = await resizeImageBlob(blob);
 
-  // Apply the garment — no reconnection needed
+  // Apply the garment - no reconnection needed
   clientRef.current.setImage(resized, {
     prompt: product.prompt,
     enhance: false,
@@ -115,9 +115,9 @@ Requires `OPENAI_API_KEY` in `.env.local`.
 
 This example uses Next.js + Tailwind + `@dnd-kit/core`, but the core Decart integration works with any React framework. The key files to port:
 
-1. **`app/api/tokens/route.ts`** — adapt to your backend (Express, Fastify, etc.)
-2. **`hooks/useDecartRealtime.ts`** — works in any React app as-is
-3. **`hooks/useCamera.ts`** — works in any React app as-is
+1. **`app/api/tokens/route.ts`** - adapt to your backend (Express, Fastify, etc.)
+2. **`hooks/useDecartRealtime.ts`** - works in any React app as-is
+3. **`hooks/useCamera.ts`** - works in any React app as-is
 
 ---
 

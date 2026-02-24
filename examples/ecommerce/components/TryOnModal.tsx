@@ -14,7 +14,7 @@ interface TryOnModalProps {
 const STATUS_LABELS: Record<ConnectionStatus, string> = {
   idle: "Initializing...",
   connecting: "Connecting...",
-  connected: "Connected — applying garment...",
+  connected: "Connected - applying garment...",
   generating: "Live",
   reconnecting: "Reconnecting...",
   disconnected: "Disconnected",

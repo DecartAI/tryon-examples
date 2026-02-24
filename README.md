@@ -6,8 +6,8 @@ Two production-ready Next.js examples that show how to integrate Decart's realti
 
 | Example | Use case | Integration style |
 |---------|----------|-------------------|
-| [**E-commerce**](examples/ecommerce/) | "Try it on" button on product pages | Modal overlay — click to open, camera + AI in a popup |
-| [**Standalone**](examples/standalone/) | Dedicated try-on experience | Full-page — products sidebar, drag onto live video |
+| [**E-commerce**](examples/ecommerce/) | "Try it on" button on product pages | Modal overlay - click to open, camera + AI in a popup |
+| [**Standalone**](examples/standalone/) | Dedicated try-on experience | Full-page - products sidebar, drag onto live video |
 
 ---
 
@@ -21,7 +21,7 @@ Two production-ready Next.js examples that show how to integrate Decart's realti
 export DECART_API_KEY="your-api-key-here"
 ```
 
-> **Note:** Both examples use [client tokens](https://docs.platform.decart.ai/getting-started/client-tokens) — your permanent API key stays on the server, and the browser only receives a short-lived ephemeral token.
+> **Note:** Both examples use [client tokens](https://docs.platform.decart.ai/getting-started/client-tokens) - your permanent API key stays on the server, and the browser only receives a short-lived ephemeral token.
 
 ---
 
@@ -91,7 +91,7 @@ await rtClient.setImage(garmentBlob, {
 });
 ```
 
-Call `setImage()` again at any time to switch garments — no need to reconnect.
+Call `setImage()` again at any time to switch garments - no need to reconnect.
 
 ---
 
@@ -108,10 +108,10 @@ The model works best with structured prompts that follow a **substitute** or **a
 
 **Writing good prompts:**
 
-- Be specific — include color, material, texture, pattern, and fit
+- Be specific - include color, material, texture, pattern, and fit
 - Aim for 20–30 words
 - Use generic references when you don't know the current outfit: `"the current top"`, `"the current bottoms"`
-- Don't just say "a shirt" — say `"a light blue linen shirt with a relaxed fit and rolled sleeves"`
+- Don't just say "a shirt" - say `"a light blue linen shirt with a relaxed fit and rolled sleeves"`
 
 **Examples:**
 
@@ -120,15 +120,15 @@ The model works best with structured prompts that follow a **substitute** or **a
 ✅ "Substitute the current top with a black leather bomber jacket with ribbed cuffs"
 ✅ "Add a navy baseball cap to the person's head"
 
-❌ "Put a jacket on the person"        (too vague — no color, material, or fit)
+❌ "Put a jacket on the person"        (too vague - no color, material, or fit)
 ❌ "Red hoodie"                         (missing action and context)
 ```
 
 ### Reference images
 
-- **Clean garment images work best** — just the clothing item, no person wearing it
+- **Clean garment images work best** - just the clothing item, no person wearing it
 - **White or clean backgrounds** are ideal
-- **At least 512x512 pixels** — the model reproduces what it sees, so clear garment = better results
+- **At least 512x512 pixels** - the model reproduces what it sees, so clear garment = better results
 
 ### Enhance prompt (optional)
 
@@ -189,17 +189,17 @@ Your permanent `DECART_API_KEY` never leaves the server. The browser receives a 
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
-| `OPENAI_API_KEY` | No | Powers `/api/enhance-prompt` — auto-generates prompts from garment images |
+| `OPENAI_API_KEY` | No | Powers `/api/enhance-prompt` - auto-generates prompts from garment images |
 
 ---
 
 ## Next steps
 
-- [Decart Quickstart](https://docs.platform.decart.ai/getting-started/quickstart) — Get your API key and first result in minutes
-- [Client Tokens](https://docs.platform.decart.ai/getting-started/client-tokens) — Secure browser authentication for production
-- [Lucy 2 Model Guide](https://docs.platform.decart.ai/models/realtime/lucy-2) — Character transformation, text editing, and reference images
-- [JavaScript Realtime SDK](https://docs.platform.decart.ai/sdks/javascript-realtime) — Full WebRTC API reference
-- [Use Cases](https://docs.platform.decart.ai/examples/use-cases) — More patterns: character transformation, live streaming, avatars
+- [Decart Quickstart](https://docs.platform.decart.ai/getting-started/quickstart) - Get your API key and first result in minutes
+- [Client Tokens](https://docs.platform.decart.ai/getting-started/client-tokens) - Secure browser authentication for production
+- [Lucy 2 Model Guide](https://docs.platform.decart.ai/models/realtime/lucy-2) - Character transformation, text editing, and reference images
+- [JavaScript Realtime SDK](https://docs.platform.decart.ai/sdks/javascript-realtime) - Full WebRTC API reference
+- [Use Cases](https://docs.platform.decart.ai/examples/use-cases) - More patterns: character transformation, live streaming, avatars
 
 ---
 

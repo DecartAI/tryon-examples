@@ -1,6 +1,6 @@
 # E-commerce Virtual Try-On
 
-> Add a "Try it on" button to any product page — opens a modal with the user's camera and real-time AI try-on.
+> Add a "Try it on" button to any product page - opens a modal with the user's camera and real-time AI try-on.
 
 Users browse a product grid, click "Try On", and see themselves wearing the garment in real-time through their camera.
 
@@ -122,9 +122,9 @@ Requires `OPENAI_API_KEY` in `.env.local`.
 
 This example uses Next.js + Tailwind, but the core integration works with any React framework. The key files to port:
 
-1. **`app/api/tokens/route.ts`** — adapt to your backend (Express, Fastify, etc.)
-2. **`hooks/useDecartRealtime.ts`** — works in any React app as-is
-3. **`hooks/useCamera.ts`** — works in any React app as-is
+1. **`app/api/tokens/route.ts`** - adapt to your backend (Express, Fastify, etc.)
+2. **`hooks/useDecartRealtime.ts`** - works in any React app as-is
+3. **`hooks/useCamera.ts`** - works in any React app as-is
 
 ---
 
