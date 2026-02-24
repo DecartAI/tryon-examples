@@ -2,7 +2,7 @@
 
 > Add a "Try it on" button to any product page - opens a modal with the user's camera and real-time AI try-on.
 
-Users browse a product grid, click "Try On", and see themselves wearing the garment in real-time through their camera.
+Users browse a product grid, click "Try On", and see themselves wearing the garment in real-time through their camera. This is the simplest integration - each product has a hardcoded prompt. For AI-generated prompts, see the [standalone example](../standalone/).
 
 ![E-commerce example](screenshot.png)
 

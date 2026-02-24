@@ -127,23 +127,26 @@ The model works best with structured prompts that follow a **substitute** or **a
 - **White or clean backgrounds** are ideal
 - **At least 512x512 pixels** - the model reproduces what it sees, so clear garment = better results
 
-### Manual enhance prompt (optional)
+### AI-generated prompts (standalone example)
 
-For user-uploaded garment images where you don't have a pre-written prompt, use GPT-4o-mini to auto-generate one. Both examples include an optional `/api/enhance-prompt` endpoint:
+For user-uploaded garment images where you don't have a pre-written prompt, use GPT-4o-mini to auto-generate one. The [standalone example](examples/standalone/) demonstrates this - it sends both the garment image and a camera frame of the person to `/api/enhance-prompt`:
 
 ```typescript
 const formData = new FormData();
 formData.append("image", garmentBlob);
+formData.append("personFrame", cameraFrameBlob);
 
 const res = await fetch("/api/enhance-prompt", {
   method: "POST",
   body: formData,
 });
 const { prompt } = await res.json();
-// → "Substitute the plain white t-shirt with a red plaid flannel shirt with a relaxed fit"
+// → "Substitute the grey crewneck sweater with a blue and pink flame print hoodie with an oversized fit"
 ```
 
-Set `OPENAI_API_KEY` in `.env.local` to enable it.
+The person frame gives GPT-4o-mini context about what the person is currently wearing, so it generates more accurate prompts (e.g. "Substitute the grey sweater" instead of generic "Substitute the current top").
+
+Requires `OPENAI_API_KEY` in `.env.local`.
 
 ---
 
@@ -186,7 +189,7 @@ Your permanent `DECART_API_KEY` never leaves the server. The browser receives a 
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
-| `OPENAI_API_KEY` | No | Powers `/api/enhance-prompt` - auto-generates prompts from garment images |
+| `OPENAI_API_KEY` | Standalone only | Powers `/api/enhance-prompt` - auto-generates prompts from garment images |
 
 ---
 
