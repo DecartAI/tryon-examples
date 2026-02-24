@@ -101,8 +101,8 @@ export function TryOnModal({ product, onClose }: TryOnModalProps) {
   const error = camError || rtError;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-3xl mx-4 bg-white rounded-2xl overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-8">
+      <div className="relative w-full max-w-5xl max-h-full bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div>
             <h2 className="font-semibold text-lg">Try On: {product.name}</h2>
@@ -125,7 +125,7 @@ export function TryOnModal({ product, onClose }: TryOnModalProps) {
           </button>
         </div>
 
-        <div className="relative aspect-[3/4] bg-gray-900">
+        <div className="relative flex-1 min-h-0 bg-gray-900">
           <video
             ref={videoRef}
             autoPlay
