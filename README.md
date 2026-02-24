@@ -193,7 +193,7 @@ Your permanent `DECART_API_KEY` never leaves the server. The browser receives a 
 
 ---
 
-## Next steps
+## Resources
 
 - [Decart Quickstart](https://docs.platform.decart.ai/getting-started/quickstart) - Get your API key and first result in minutes
 - [JavaScript Realtime SDK](https://docs.platform.decart.ai/sdks/javascript-realtime) - Full WebRTC API reference
