@@ -7,7 +7,7 @@ Two production-ready Next.js examples that show how to integrate Decart's realti
 | Example | Use case | Integration style |
 |---------|----------|-------------------|
 | [**E-commerce**](examples/ecommerce/) | "Try it on" button on product pages | Modal overlay - click to open, camera + AI in a popup |
-| [**Standalone**](examples/standalone/) | Dedicated try-on experience | Full-page - products sidebar, drag onto live video |
+| [**Standalone**](examples/standalone/) | Dedicated try-on experience | Full-page - products sidebar, click to try on |
 
 ---
 

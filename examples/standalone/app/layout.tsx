@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Virtual Try-On - Standalone Example",
   description:
-    "Dedicated try-on experience with drag-and-drop using Decart",
+    "Dedicated try-on experience using Decart",
 };
 
 export default function RootLayout({

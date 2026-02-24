@@ -1,8 +1,8 @@
 # Standalone Virtual Try-On
 
-> A dedicated try-on experience - products on the left, live camera in the center. Drag a product onto the video to try it on.
+> A dedicated try-on experience - products on the left, live camera in the center. Click a product to try it on.
 
-The camera connects automatically on page load. Users drag garments from a sidebar onto the live video to see themselves wearing each item in real-time.
+The camera connects automatically on page load. Users click garments from a sidebar to see themselves wearing each item in real-time.
 
 ---
 
@@ -35,7 +35,7 @@ DECART_API_KEY=sk_your_key_here
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Your camera will start automatically. Drag any product from the left sidebar onto the video to try it on.
+Open [http://localhost:3000](http://localhost:3000). Your camera will start automatically. Click any product from the left sidebar to try it on.
 
 ---
 
@@ -47,19 +47,16 @@ Page loads
     → Fetch client token from /api/tokens
       → Connect to Decart's lucy_2_rt model (WebRTC)
         → User sees themselves in the live video feed
-          → User drags a product onto the video
+          → User clicks a product
             → setImage(garment, prompt) sends the garment to the model
               → AI video stream shows the user wearing the garment
-                → Drag another product to switch instantly
+                → Click another product to switch instantly
 ```
 
-When a product is dropped on the video, it calls `setImage()` with the garment:
+When a product is clicked, it calls `setImage()` with the garment:
 
 ```typescript
-const handleDragEnd = async (event: DragEndEvent) => {
-  if (!event.over || !event.active.data.current) return;
-  const product = event.active.data.current as Product;
-
+const handleSelectProduct = async (product: Product) => {
   // Load and resize the garment image
   const blob = await urlToImageBlob(product.image);
   const resized = await resizeImageBlob(blob);
@@ -113,7 +110,7 @@ Requires `OPENAI_API_KEY` in `.env.local`.
 
 ### Adapt to your stack
 
-This example uses Next.js + Tailwind + `@dnd-kit/core`, but the core Decart integration works with any React framework. The key files to port:
+This example uses Next.js + Tailwind, but the core Decart integration works with any React framework. The key files to port:
 
 1. **`app/api/tokens/route.ts`** - adapt to your backend (Express, Fastify, etc.)
 2. **`hooks/useDecartRealtime.ts`** - works in any React app as-is
