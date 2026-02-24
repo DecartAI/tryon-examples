@@ -59,6 +59,7 @@ export function TryOnView({
           className={`absolute inset-0 w-full h-full object-cover transition-opacity ${
             isGenerating ? "opacity-20" : "opacity-100"
           }`}
+          style={{ transform: "scaleX(-1)" }}
         />
 
         {/* Remote AI stream */}
@@ -70,6 +71,7 @@ export function TryOnView({
           className={`absolute inset-0 w-full h-full object-cover transition-opacity ${
             isGenerating ? "opacity-100" : "opacity-0"
           }`}
+          style={{ transform: "scaleX(-1)" }}
         />
 
         {/* Status indicator */}

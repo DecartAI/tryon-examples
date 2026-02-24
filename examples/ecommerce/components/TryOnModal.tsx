@@ -132,6 +132,7 @@ export function TryOnModal({ product, onClose }: TryOnModalProps) {
             playsInline
             muted
             className="w-full h-full object-cover"
+            style={{ transform: "scaleX(-1)" }}
           />
           {status === "generating" && (
             <div className="absolute top-3 right-3 flex items-center gap-2 bg-green-500/90 text-white text-xs font-medium px-3 py-1.5 rounded-full">
