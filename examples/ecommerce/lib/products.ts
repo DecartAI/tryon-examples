@@ -21,6 +21,13 @@ export const PRODUCTS: Product[] = [
     price: 189,
   },
   {
+    name: "Heart Patch Jeans",
+    image: "/products/heart-jeans.png",
+    prompt:
+      "Substitute the current bottoms with wide-leg blue denim jeans with heart-shaped patchwork cutouts",
+    price: 89,
+  },
+  {
     name: "Flame Sweatpants",
     image: "/products/flame-sweatpants.png",
     prompt:
