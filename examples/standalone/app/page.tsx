@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { Product } from "@/lib/products";
 import { useCamera } from "@/hooks/useCamera";
 import { useDecartRealtime } from "@/hooks/useDecartRealtime";
@@ -11,11 +10,12 @@ import { TryOnView } from "@/components/TryOnView";
 
 export default function StandalonePage() {
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
+  const [prompt, setPrompt] = useState("");
   const { stream, startCamera, stopCamera } = useCamera();
   const { status, error, connect, disconnect, clientRef } =
     useDecartRealtime();
   const remoteVideoRef = useRef<React.RefObject<HTMLVideoElement | null>>(null);
-  const connectedRef = useRef(false);
+  const garmentBlobRef = useRef<Blob | null>(null);
 
   const handleRemoteStreamRef = useCallback(
     (ref: React.RefObject<HTMLVideoElement | null>) => {
@@ -24,7 +24,6 @@ export default function StandalonePage() {
     []
   );
 
-  // Auto-start camera and connect on mount
   useEffect(() => {
     let cancelled = false;
 
@@ -46,7 +45,6 @@ export default function StandalonePage() {
           }
         },
       });
-      connectedRef.current = true;
     }
 
     init();
@@ -58,16 +56,16 @@ export default function StandalonePage() {
     };
   }, [startCamera, stopCamera, connect, disconnect]);
 
-  const handleDragEnd = useCallback(
-    async (event: DragEndEvent) => {
-      if (!event.over || !event.active.data.current) return;
-      const product = event.active.data.current as Product;
+  const handleSelectProduct = useCallback(
+    async (product: Product) => {
       setActiveProduct(product);
+      setPrompt(product.prompt);
 
       if (!clientRef.current) return;
 
       const blob = await urlToImageBlob(product.image);
       const resized = await resizeImageBlob(blob);
+      garmentBlobRef.current = resized;
       clientRef.current.setImage(resized, {
         prompt: product.prompt,
         enhance: false,
@@ -76,17 +74,29 @@ export default function StandalonePage() {
     [clientRef]
   );
 
+  const handlePromptSubmit = useCallback(() => {
+    if (!clientRef.current || !garmentBlobRef.current) return;
+    clientRef.current.setImage(garmentBlobRef.current, {
+      prompt,
+      enhance: false,
+    });
+  }, [clientRef, prompt]);
+
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      <div className="h-screen flex">
-        <ProductSidebar activeProduct={activeProduct} />
-        <TryOnView
-          localStream={stream}
-          status={status}
-          error={error}
-          onRemoteStream={handleRemoteStreamRef}
-        />
-      </div>
-    </DndContext>
+    <div className="h-screen flex">
+      <ProductSidebar
+        activeProduct={activeProduct}
+        onSelectProduct={handleSelectProduct}
+      />
+      <TryOnView
+        localStream={stream}
+        status={status}
+        error={error}
+        prompt={prompt}
+        onPromptChange={setPrompt}
+        onPromptSubmit={handlePromptSubmit}
+        onRemoteStream={handleRemoteStreamRef}
+      />
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: system-ui, -apple-system, sans-serif;
+  --font-sans: "Helvetica Neue", "Arial", system-ui, sans-serif;
 }
 
 button {

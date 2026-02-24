@@ -8,25 +8,25 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onTryOn }: ProductCardProps) {
   return (
-    <div className="group rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-      <div className="relative aspect-square bg-gray-50">
+    <div className="group">
+      <div className="relative aspect-[3/4] bg-neutral-100 rounded-lg overflow-hidden">
         <Image
           src={product.image}
           alt={product.name}
           fill
-          className="object-cover"
-          sizes="(max-width: 768px) 50vw, 25vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 768px) 50vw, 33vw"
         />
-      </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-lg">{product.name}</h3>
-        <p className="text-gray-500 mt-1">${product.price}</p>
         <button
           onClick={onTryOn}
-          className="mt-3 w-full py-2.5 px-4 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+          className="absolute bottom-3 left-3 right-3 py-2.5 bg-white/90 backdrop-blur-sm text-neutral-900 rounded-lg text-sm font-medium opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-white"
         >
           Try On
         </button>
+      </div>
+      <div className="mt-3">
+        <h3 className="text-sm font-medium">{product.name}</h3>
+        <p className="text-sm text-neutral-500 mt-0.5">${product.price}</p>
       </div>
     </div>
   );

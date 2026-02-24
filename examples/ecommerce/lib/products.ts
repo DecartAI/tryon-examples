@@ -7,45 +7,45 @@ export interface Product {
 
 export const PRODUCTS: Product[] = [
   {
-    name: "Denim Jacket",
-    image: "/products/denim-jacket.jpg",
+    name: "Yellow Puffer Jacket",
+    image: "/products/yellow-puffer.png",
     prompt:
-      "Substitute the current top with a classic blue denim jacket with a relaxed fit",
-    price: 89,
+      "Substitute the current top with a bright yellow puffer jacket with a zip front and oversized fit",
+    price: 149,
   },
   {
-    name: "Red Hoodie",
-    image: "/products/red-hoodie.jpg",
+    name: "Black Puffer Jacket",
+    image: "/products/black-puffer.png",
     prompt:
-      "Substitute the current top with a bright red hoodie with an oversized casual fit",
+      "Substitute the current top with a glossy black hooded puffer jacket with a zip front",
+    price: 189,
+  },
+  {
+    name: "Blue Cashmere Sweater",
+    image: "/products/blue-sweater.png",
+    prompt:
+      "Substitute the current top with a light blue cashmere crew neck sweater with a slim fit",
+    price: 129,
+  },
+  {
+    name: "Striped Knit Tee",
+    image: "/products/striped-knit-tee.png",
+    prompt:
+      "Substitute the current top with a black and white striped knit short-sleeve tee",
     price: 59,
   },
   {
-    name: "Flannel Shirt",
-    image: "/products/flannel-shirt.jpg",
+    name: "Denim Jacket",
+    image: "/products/denim-jacket.png",
     prompt:
-      "Substitute the current top with a red and black plaid flannel shirt",
-    price: 49,
+      "Substitute the current top with a dark washed denim zip jacket with a pointed collar",
+    price: 99,
   },
   {
-    name: "Knit Sweater",
-    image: "/products/knit-sweater.jpg",
+    name: "Beige Quarter-Zip",
+    image: "/products/beige-quarter-zip.png",
     prompt:
-      "Substitute the current top with a cozy knit sweater with a crew neck",
-    price: 69,
-  },
-  {
-    name: "Leather Bomber",
-    image: "/products/leather-bomber.jpg",
-    prompt:
-      "Substitute the current top with a black leather bomber jacket",
-    price: 199,
-  },
-  {
-    name: "White T-Shirt",
-    image: "/products/white-tee.jpg",
-    prompt:
-      "Substitute the current top with a plain white cotton t-shirt with a regular fit",
-    price: 29,
+      "Substitute the current top with a beige ribbed knit quarter-zip sweater with a relaxed fit",
+    price: 89,
   },
 ];
