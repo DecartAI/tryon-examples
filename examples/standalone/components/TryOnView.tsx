@@ -8,6 +8,7 @@ interface TryOnViewProps {
   status: ConnectionStatus;
   error: string | null;
   prompt: string;
+  processingStatus?: string | null;
   onPromptChange: (prompt: string) => void;
   onPromptSubmit: () => void;
   onRemoteStream: (ref: React.RefObject<HTMLVideoElement | null>) => void;
@@ -28,6 +29,7 @@ export function TryOnView({
   status,
   error,
   prompt,
+  processingStatus,
   onPromptChange,
   onPromptSubmit,
   onRemoteStream,
@@ -91,6 +93,13 @@ export function TryOnView({
             {STATUS_LABELS[status]}
           </div>
         </div>
+
+        {processingStatus && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/50 backdrop-blur-sm z-20">
+            <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+            <p className="text-white/80 text-sm font-medium">{processingStatus}</p>
+          </div>
+        )}
 
         {error && (
           <div className="absolute bottom-4 left-4 right-4 bg-red-500/90 text-white text-sm px-4 py-2 rounded-lg z-20">

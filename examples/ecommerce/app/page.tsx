@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PRODUCTS, Product } from "@/lib/products";
 import { ProductCard } from "@/components/ProductCard";
 import { TryOnModal } from "@/components/TryOnModal";
 
 export default function HomePage() {
+  const searchParams = useSearchParams();
+  const enhanceEnabled = searchParams.get("enhance") === "true";
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   return (
@@ -77,6 +80,7 @@ export default function HomePage() {
       {selectedProduct && (
         <TryOnModal
           product={selectedProduct}
+          enhanceEnabled={enhanceEnabled}
           onClose={() => setSelectedProduct(null)}
         />
       )}

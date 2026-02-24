@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { Product } from "@/lib/products";
 import { useCamera } from "@/hooks/useCamera";
 import { useDecartRealtime } from "@/hooks/useDecartRealtime";
@@ -9,8 +10,12 @@ import { ProductSidebar } from "@/components/ProductSidebar";
 import { TryOnView } from "@/components/TryOnView";
 
 export default function StandalonePage() {
+  const searchParams = useSearchParams();
+  const enhanceEnabled = searchParams.get("enhance") === "true";
+
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
   const [prompt, setPrompt] = useState("");
+  const [processingStatus, setProcessingStatus] = useState<string | null>(null);
   const { stream, startCamera, stopCamera } = useCamera();
   const { status, error, connect, disconnect, clientRef } =
     useDecartRealtime();
@@ -58,19 +63,41 @@ export default function StandalonePage() {
   const handleSelectProduct = useCallback(
     async (product: Product) => {
       setActiveProduct(product);
-      setPrompt(product.prompt);
 
       if (!clientRef.current) return;
 
       const blob = await urlToImageBlob(product.image);
       const resized = await resizeImageBlob(blob);
       garmentBlobRef.current = resized;
+
+      let finalPrompt = product.prompt;
+
+      if (enhanceEnabled) {
+        setProcessingStatus("Generating try-on prompt...");
+        try {
+          const formData = new FormData();
+          formData.append("image", resized);
+          const res = await fetch("/api/enhance-prompt", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          if (data.prompt) {
+            finalPrompt = data.prompt;
+          }
+        } catch {
+          // Fall back to hardcoded prompt
+        }
+        setProcessingStatus(null);
+      }
+
+      setPrompt(finalPrompt);
       clientRef.current.setImage(resized, {
-        prompt: product.prompt,
+        prompt: finalPrompt,
         enhance: false,
       });
     },
-    [clientRef]
+    [clientRef, enhanceEnabled]
   );
 
   const handlePromptSubmit = useCallback(() => {
@@ -92,6 +119,7 @@ export default function StandalonePage() {
         status={status}
         error={error}
         prompt={prompt}
+        processingStatus={processingStatus}
         onPromptChange={setPrompt}
         onPromptSubmit={handlePromptSubmit}
         onRemoteStream={handleRemoteStreamRef}

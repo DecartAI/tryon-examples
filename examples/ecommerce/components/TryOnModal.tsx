@@ -11,6 +11,7 @@ import { urlToImageBlob, resizeImageBlob } from "@/lib/image-utils";
 
 interface TryOnModalProps {
   product: Product;
+  enhanceEnabled?: boolean;
   onClose: () => void;
 }
 
@@ -24,13 +25,14 @@ const STATUS_LABELS: Record<ConnectionStatus, string> = {
   error: "Connection error",
 };
 
-export function TryOnModal({ product, onClose }: TryOnModalProps) {
+export function TryOnModal({ product, enhanceEnabled, onClose }: TryOnModalProps) {
   const { error: camError, startCamera, stopCamera } = useCamera();
   const { status, error: rtError, connect, disconnect, clientRef } =
     useDecartRealtime();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [prompt, setPrompt] = useState(product.prompt);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<string | null>(null);
   const garmentBlobRef = useRef<Blob | null>(null);
 
   const handleRemoteStream = useCallback((remoteStream: MediaStream) => {
@@ -53,7 +55,6 @@ export function TryOnModal({ product, onClose }: TryOnModalProps) {
       const rtClient = await connect({
         apiKey,
         stream: mediaStream,
-        prompt: product.prompt,
         onRemoteStream: handleRemoteStream,
       });
 
@@ -62,8 +63,32 @@ export function TryOnModal({ product, onClose }: TryOnModalProps) {
       const blob = await urlToImageBlob(product.image);
       const resized = await resizeImageBlob(blob);
       garmentBlobRef.current = resized;
+
+      let finalPrompt = product.prompt;
+
+      if (enhanceEnabled) {
+        setProcessingStatus("Generating try-on prompt...");
+        try {
+          const formData = new FormData();
+          formData.append("image", resized);
+          const enhanceRes = await fetch("/api/enhance-prompt", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await enhanceRes.json();
+          if (data.prompt) {
+            finalPrompt = data.prompt;
+          }
+        } catch {
+          // Fall back to hardcoded prompt
+        }
+        setProcessingStatus(null);
+      }
+
+      if (cancelled) return;
+      setPrompt(finalPrompt);
       rtClient.setImage(resized, {
-        prompt: product.prompt,
+        prompt: finalPrompt,
         enhance: false,
       });
     }
@@ -77,6 +102,7 @@ export function TryOnModal({ product, onClose }: TryOnModalProps) {
     };
   }, [
     product,
+    enhanceEnabled,
     startCamera,
     stopCamera,
     connect,
@@ -134,7 +160,13 @@ export function TryOnModal({ product, onClose }: TryOnModalProps) {
             className="w-full h-full object-cover"
             style={{ transform: "scaleX(-1)" }}
           />
-          {status === "generating" && (
+          {processingStatus && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/50 backdrop-blur-sm z-20">
+              <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              <p className="text-white/80 text-sm font-medium">{processingStatus}</p>
+            </div>
+          )}
+          {status === "generating" && !processingStatus && (
             <div className="absolute top-3 right-3 flex items-center gap-2 bg-green-500/90 text-white text-xs font-medium px-3 py-1.5 rounded-full">
               <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
               Live
