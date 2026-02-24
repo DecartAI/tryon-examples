@@ -2,9 +2,7 @@
 
 > Add real-time virtual try-on to any web app using Decart's `lucy_2_rt` realtime model.
 
-Two production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on — from a simple "Try it on" button on product pages to a full drag-and-drop try-on experience. Each example is self-contained and runs independently.
-
-## Examples
+Two production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
 
 | Example | Use case | Integration style |
 |---------|----------|-------------------|
@@ -29,7 +27,7 @@ export DECART_API_KEY="your-api-key-here"
 
 ## Core Decart integration
 
-The entire integration is three steps. Every file in these examples builds on this foundation.
+The entire integration is three steps.
 
 ### Step 1: Create a client token (server-side)
 
@@ -87,12 +85,7 @@ const rtClient = await client.realtime.connect(stream, {
 Call `setImage()` to send a reference garment image with a descriptive prompt. The model applies the garment to the person in real-time.
 
 ```typescript
-// Load and resize the garment image
-const garmentBlob = await urlToImageBlob("/products/denim-jacket.jpg");
-const resized = await resizeImageBlob(garmentBlob);
-
-// Apply the garment
-await rtClient.setImage(resized, {
+await rtClient.setImage(garmentBlob, {
   prompt: "Substitute the current top with a classic blue denim jacket with a relaxed fit",
   enhance: false,
 });
@@ -133,14 +126,9 @@ The model works best with structured prompts that follow a **substitute** or **a
 
 ### Reference images
 
-The quality of your garment image directly affects results:
-
 - **Clean garment images work best** — just the clothing item, no person wearing it
 - **White or clean backgrounds** are ideal
-- **High resolution** — at least 512x512 pixels
-- The model reproduces what it sees — a clear, flat-lay garment image gives the best results
-
-> **Tip:** Both examples include `resizeImageBlob()` to automatically downscale large images to 1024px before sending to the model.
+- **At least 512x512 pixels** — the model reproduces what it sees, so clear garment = better results
 
 ### Enhance prompt (optional)
 
@@ -150,18 +138,15 @@ For user-uploaded garment images where you don't have a pre-written prompt, use 
 const formData = new FormData();
 formData.append("image", garmentBlob);
 
-// Optionally include the person's camera frame for more accurate prompts
-formData.append("personFrame", cameraFrameBlob);
-
 const res = await fetch("/api/enhance-prompt", {
   method: "POST",
   body: formData,
 });
 const { prompt } = await res.json();
-// → "Substitute the plain white t-shirt with a red plaid flannel shirt with a relaxed fit and chest pockets"
+// → "Substitute the plain white t-shirt with a red plaid flannel shirt with a relaxed fit"
 ```
 
-This endpoint uses GPT-4o-mini vision to analyze the garment image (and optionally the person's current outfit) and returns a well-structured substitute/add prompt. Set `OPENAI_API_KEY` in `.env.local` to enable it.
+Set `OPENAI_API_KEY` in `.env.local` to enable it.
 
 ---
 
@@ -195,7 +180,7 @@ This endpoint uses GPT-4o-mini vision to analyze the garment image (and optional
 └─────────────────────────────────────────────────┘
 ```
 
-**Key security pattern:** Your permanent `DECART_API_KEY` never leaves the server. The browser receives a short-lived client token (`ek_...`) that expires after 10 minutes. Active WebRTC sessions continue working even after the token expires.
+Your permanent `DECART_API_KEY` never leaves the server. The browser receives a short-lived client token (`ek_...`) that expires after 10 minutes. Active WebRTC sessions continue working even after the token expires.
 
 ---
 
@@ -205,42 +190,6 @@ This endpoint uses GPT-4o-mini vision to analyze the garment image (and optional
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
 | `OPENAI_API_KEY` | No | Powers `/api/enhance-prompt` — auto-generates prompts from garment images |
-
----
-
-## Project structure
-
-```
-decart-tryon-examples/
-├── README.md
-└── examples/
-    ├── ecommerce/                  # "Try it on" button → modal
-    │   ├── app/
-    │   │   ├── page.tsx            # Product grid
-    │   │   └── api/
-    │   │       ├── tokens/         # Decart client token
-    │   │       └── enhance-prompt/ # GPT-4o-mini prompt gen
-    │   ├── components/
-    │   │   ├── ProductCard.tsx
-    │   │   └── TryOnModal.tsx      # Camera + AI overlay
-    │   ├── hooks/
-    │   │   ├── useCamera.ts
-    │   │   └── useDecartRealtime.ts
-    │   └── lib/
-    │       ├── products.ts         # Product catalog
-    │       └── image-utils.ts      # urlToImageBlob, resizeImageBlob
-    │
-    └── standalone/                 # Drag-and-drop try-on
-        ├── app/
-        │   ├── page.tsx            # Full-page layout with DndContext
-        │   └── api/                # Same token + enhance-prompt routes
-        ├── components/
-        │   ├── ProductSidebar.tsx
-        │   ├── DraggableProduct.tsx
-        │   └── TryOnView.tsx       # Camera + AI + drop zone
-        ├── hooks/                  # Same hooks as ecommerce
-        └── lib/                    # Same lib as ecommerce
-```
 
 ---
 
