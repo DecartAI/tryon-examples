@@ -21,11 +21,11 @@ export const PRODUCTS: Product[] = [
     price: 189,
   },
   {
-    name: "Blue Cashmere Sweater",
-    image: "/products/blue-sweater.png",
+    name: "Flame Sweatpants",
+    image: "/products/flame-sweatpants.png",
     prompt:
-      "Substitute the current top with a light blue cashmere crew neck sweater with a slim fit",
-    price: 129,
+      "Substitute the current bottoms with blue and pink flame print sweatpants with an elastic waist and relaxed fit",
+    price: 79,
   },
   {
     name: "Striped Knit Tee",
@@ -40,12 +40,5 @@ export const PRODUCTS: Product[] = [
     prompt:
       "Substitute the current top with a dark washed denim zip jacket with a pointed collar",
     price: 99,
-  },
-  {
-    name: "Beige Quarter-Zip",
-    image: "/products/beige-quarter-zip.png",
-    prompt:
-      "Substitute the current top with a beige ribbed knit quarter-zip sweater with a relaxed fit",
-    price: 89,
   },
 ];
