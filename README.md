@@ -103,7 +103,7 @@ The ideal setup is a **clean garment image** paired with a **descriptive prompt*
 - **Clean garment images work best** - just the clothing item, no person wearing it
 - **White or clean backgrounds** are ideal
 - **At least 512x512 pixels** - the model reproduces what it sees, so clear garment = better results
-- If your source image shows a person wearing the garment, consider using an image editing model (e.g. background removal) to extract just the clothing item
+- If your source image shows a person wearing the garment, consider using an image editing model (e.g. background removal) to extract just the clothing item from the person
 
 **Prompt structure:**
 
