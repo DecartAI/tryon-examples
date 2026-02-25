@@ -15,20 +15,17 @@ cd examples/person-detection
 npm install
 ```
 
-### 2. Set your API keys
+### 2. Set your API key
 
 ```bash
 cp .env.example .env.local
 ```
 
-Open `.env.local` and add both keys:
+Open `.env.local` and add your key:
 
 ```env
 DECART_API_KEY=sk_your_key_here
-OPENAI_API_KEY=sk_your_openai_key_here
 ```
-
-> **Note:** This example requires both keys. The Decart key powers the realtime try-on, and the OpenAI key powers the prompt generation.
 
 ### 3. Start the dev server
 
@@ -50,7 +47,7 @@ Page loads
         → Person detected (landmarks found)
           → Fetch client token from /api/tokens
             → Connect to Decart's lucy_2_rt model (WebRTC)
-              → User clicks a product → prompt generated → garment applied
+              → User clicks a product → garment applied
         → Person leaves (3 consecutive misses, ~3s)
           → Disconnect from Decart (stops billing)
             → Person returns → fresh token → reconnect → re-apply last garment
@@ -68,7 +65,7 @@ No server-side detection needed. MediaPipe's pose landmarker runs entirely in th
 | `components/PersonDetectionView.tsx` | Extended view with detection-aware status badge (Scanning / Person detected / Live) and contextual hints |
 | `app/page.tsx` | Main orchestration - detection-driven connect/disconnect lifecycle with automatic garment re-application |
 
-Everything else (`useCamera`, `useDecartRealtime`, `ProductSidebar`, API routes, image utils) is the same as the [standalone example](../standalone/).
+Everything else (`useCamera`, `useDecartRealtime`, `ProductSidebar`, token API route, image utils) is the same as the [standalone example](../standalone/).
 
 ---
 
@@ -77,7 +74,7 @@ Everything else (`useCamera`, `useDecartRealtime`, `ProductSidebar`, API routes,
 ```
 Camera starts → MediaPipe loads → "Scanning..."
   → Person detected → Fetch token → Connect → "Connected"
-    → User clicks product → Generate prompt → Apply garment → "Live"
+    → User clicks product → Apply garment → "Live"
     → Person leaves (3 misses) → Disconnect → "Scanning..."
       → Person returns → Fresh token → Reconnect → Re-apply last garment
 ```
@@ -104,4 +101,3 @@ Edit `lib/products.ts` and place garment images in `public/products/`. See the [
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
-| `OPENAI_API_KEY` | Yes | Powers `/api/enhance-prompt` - auto-generates prompts from garment images |

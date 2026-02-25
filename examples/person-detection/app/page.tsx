@@ -6,20 +6,16 @@ import { useCamera } from "@/hooks/useCamera";
 import { useDecartRealtime } from "@/hooks/useDecartRealtime";
 import { usePersonDetection } from "@/hooks/usePersonDetection";
 import { urlToImageBlob, resizeImageBlob } from "@/lib/image-utils";
-import { enhancePrompt } from "@/lib/enhance-prompt";
 import { ProductSidebar } from "@/components/ProductSidebar";
 import { PersonDetectionView } from "@/components/PersonDetectionView";
 
 export default function PersonDetectionPage() {
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
-  const [prompt, setPrompt] = useState("");
-  const [processingStatus, setProcessingStatus] = useState<string | null>(null);
   const { stream, startCamera, stopCamera } = useCamera();
   const { status, error, connect, disconnect, clientRef } =
     useDecartRealtime();
 
   const remoteVideoRef = useRef<React.RefObject<HTMLVideoElement | null>>(null);
-  const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const [localVideoElement, setLocalVideoElement] =
     useState<HTMLVideoElement | null>(null);
   const garmentBlobRef = useRef<Blob | null>(null);
@@ -38,7 +34,6 @@ export default function PersonDetectionPage() {
 
   const handleLocalVideoRef = useCallback(
     (ref: React.RefObject<HTMLVideoElement | null>) => {
-      localVideoRef.current = ref.current;
       setLocalVideoElement(ref.current);
     },
     []
@@ -78,14 +73,8 @@ export default function PersonDetectionPage() {
 
         // Re-apply last garment if reconnecting
         if (rtClient && lastProductRef.current && garmentBlobRef.current) {
-          const generatedPrompt = await enhancePrompt(
-            garmentBlobRef.current,
-            localVideoRef.current
-          );
-          const finalPrompt = generatedPrompt || "Try on this garment";
-          setPrompt(finalPrompt);
           rtClient.setImage(garmentBlobRef.current, {
-            prompt: finalPrompt,
+            prompt: lastProductRef.current.prompt,
             enhance: false,
           });
         }
@@ -114,30 +103,13 @@ export default function PersonDetectionPage() {
       const resized = await resizeImageBlob(blob);
       garmentBlobRef.current = resized;
 
-      setProcessingStatus("Generating try-on prompt...");
-      const generatedPrompt = await enhancePrompt(
-        resized,
-        localVideoRef.current
-      );
-      setProcessingStatus(null);
-
-      const finalPrompt = generatedPrompt || "Try on this garment";
-      setPrompt(finalPrompt);
       clientRef.current.setImage(resized, {
-        prompt: finalPrompt,
+        prompt: product.prompt,
         enhance: false,
       });
     },
     [clientRef]
   );
-
-  const handlePromptSubmit = useCallback(() => {
-    if (!clientRef.current || !garmentBlobRef.current) return;
-    clientRef.current.setImage(garmentBlobRef.current, {
-      prompt,
-      enhance: false,
-    });
-  }, [clientRef, prompt]);
 
   return (
     <div className="h-screen flex">
@@ -149,12 +121,8 @@ export default function PersonDetectionPage() {
         localStream={stream}
         status={status}
         error={error}
-        prompt={prompt}
-        processingStatus={processingStatus}
         personPresent={personPresent}
         detectionReady={detectionReady}
-        onPromptChange={setPrompt}
-        onPromptSubmit={handlePromptSubmit}
         onRemoteStream={handleRemoteStreamRef}
         onLocalVideo={handleLocalVideoRef}
       />

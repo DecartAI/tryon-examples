@@ -201,7 +201,7 @@ Your permanent `DECART_API_KEY` never leaves the server. The browser receives a 
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
-| `OPENAI_API_KEY` | Standalone & Person Detection | Powers `/api/enhance-prompt` - auto-generates prompts from garment images |
+| `OPENAI_API_KEY` | Standalone only | Powers `/api/enhance-prompt` - auto-generates prompts from garment images |
 
 ---
 
