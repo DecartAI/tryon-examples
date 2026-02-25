@@ -7,7 +7,7 @@ Two production-ready Next.js examples that show how to integrate Decart's realti
 | Example | Use case | Integration style |
 |---------|----------|-------------------|
 | [**E-commerce**](examples/ecommerce/) | "Try it on" button on product pages | Simple - hardcoded prompts, modal overlay |
-| [**Standalone**](examples/standalone/) | Dedicated try-on experience | Advanced - AI-generated prompts via GPT-4o-mini |
+| [**Standalone**](examples/standalone/) | Dedicated try-on experience | Advanced - AI-generated prompts via LLM |
 
 ---
 
@@ -94,7 +94,18 @@ Call `setImage()` again at any time to switch garments - no need to reconnect.
 
 ## Best practices
 
-### Prompt structure
+### For best results: clean image + good prompt
+
+The ideal setup is a **clean garment image** paired with a **descriptive prompt** - like the [e-commerce example](examples/ecommerce/) does. This gives the model the clearest signal of what to apply.
+
+**Reference images:**
+
+- **Clean garment images work best** - just the clothing item, no person wearing it
+- **White or clean backgrounds** are ideal
+- **At least 512x512 pixels** - the model reproduces what it sees, so clear garment = better results
+- If your source image shows a person wearing the garment, consider using an image editing model (e.g. background removal) to extract just the clothing item
+
+**Prompt structure:**
 
 The model works best with structured prompts that follow a **substitute** or **add** pattern:
 
@@ -103,14 +114,7 @@ The model works best with structured prompts that follow a **substitute** or **a
 | **Substitute** | Replacing an existing garment | `"Substitute the current top with a red plaid flannel shirt with a relaxed fit"` |
 | **Add** | Adding something the person isn't wearing | `"Add a wide-brimmed straw hat to the person's head"` |
 
-**Writing good prompts:**
-
-- Be specific - include color, material, texture, pattern, and fit
-- Aim for 20–30 words
-- Use generic references when you don't know the current outfit: `"the current top"`, `"the current bottoms"`
-- Don't just say "a shirt" - say `"a light blue linen shirt with a relaxed fit and rolled sleeves"`
-
-**Examples:**
+Be specific - include color, material, texture, pattern, and fit. Aim for 20-30 words. Use generic references when you don't know the current outfit: `"the current top"`, `"the current bottoms"`.
 
 ```
 ✅ "Substitute the current top with a bright red hoodie with an oversized casual fit"
@@ -121,20 +125,29 @@ The model works best with structured prompts that follow a **substitute** or **a
 ❌ "Red hoodie"                         (missing action and context)
 ```
 
-### Reference images
+### Built-in enhance prompt
 
-- **Clean garment images work best** - just the clothing item, no person wearing it
-- **White or clean backgrounds** are ideal
-- **At least 512x512 pixels** - the model reproduces what it sees, so clear garment = better results
+The Decart model has a built-in `enhance` option that can improve short or vague prompts automatically. Set `enhance: true` in the `setImage()` call and the model will expand your prompt internally. We are also working on a dedicated enhance API specifically optimized for try-on prompts.
 
-### AI-generated prompts (standalone example)
+```typescript
+await rtClient.setImage(garmentBlob, {
+  prompt: "Red hoodie",
+  enhance: true, // Model will expand this into a more descriptive prompt
+});
+```
 
-For user-uploaded garment images where you don't have a pre-written prompt, use GPT-4o-mini to auto-generate one. The [standalone example](examples/standalone/) demonstrates this - it sends both the garment image and a camera frame of the person to `/api/enhance-prompt`:
+This is a good fallback, but for the best results we still recommend writing detailed prompts yourself (as shown above) or generating them with an LLM.
+
+### Generating prompts with an LLM
+
+For garments where you don't have a pre-written prompt (e.g. user-uploaded images), you can use any vision LLM to auto-generate one from the garment image. The [standalone example](examples/standalone/) demonstrates this using OpenAI's GPT-4o-mini, but any vision-capable LLM works.
+
+The example sends both the garment image and a camera frame of the person to `/api/enhance-prompt`:
 
 ```typescript
 const formData = new FormData();
 formData.append("image", garmentBlob);
-formData.append("personFrame", cameraFrameBlob);
+formData.append("personFrame", cameraFrameBlob); // optional, improves accuracy
 
 const res = await fetch("/api/enhance-prompt", {
   method: "POST",
@@ -144,9 +157,7 @@ const { prompt } = await res.json();
 // → "Substitute the grey crewneck sweater with a blue and pink flame print hoodie with an oversized fit"
 ```
 
-The person frame gives GPT-4o-mini context about what the person is currently wearing, so it generates more accurate prompts (e.g. "Substitute the grey sweater" instead of generic "Substitute the current top").
-
-Requires `OPENAI_API_KEY` in `.env.local`.
+The person frame gives the LLM context about what the person is currently wearing, so it generates more accurate prompts (e.g. "Substitute the grey sweater" instead of generic "Substitute the current top").
 
 ---
 
