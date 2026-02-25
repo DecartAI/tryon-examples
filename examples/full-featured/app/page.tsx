@@ -28,6 +28,7 @@ export default function FullFeaturedPage() {
   const garmentBlobRef = useRef<Blob | null>(null);
   const lastPromptRef = useRef<string>("");
   const connectingRef = useRef(false);
+  const uploadedImageRef = useRef<string | null>(null);
 
   const { personPresent, isReady: detectionReady } =
     usePersonDetection(localVideoElement);
@@ -63,27 +64,30 @@ export default function FullFeaturedPage() {
       connectingRef.current = true;
 
       (async () => {
-        const res = await fetch("/api/tokens", { method: "POST" });
-        const { apiKey } = await res.json();
+        try {
+          const res = await fetch("/api/tokens", { method: "POST" });
+          if (!res.ok) throw new Error(`Token fetch failed: ${res.status}`);
+          const { apiKey } = await res.json();
 
-        const rtClient = await connect({
-          apiKey,
-          stream,
-          onRemoteStream: (remoteStream) => {
-            if (remoteVideoRef.current?.current) {
-              remoteVideoRef.current.current.srcObject = remoteStream;
-            }
-          },
-        });
-
-        connectingRef.current = false;
-
-        // Re-apply last garment if reconnecting
-        if (rtClient && garmentBlobRef.current && lastPromptRef.current) {
-          rtClient.setImage(garmentBlobRef.current, {
-            prompt: lastPromptRef.current,
-            enhance: false,
+          const rtClient = await connect({
+            apiKey,
+            stream,
+            onRemoteStream: (remoteStream) => {
+              if (remoteVideoRef.current?.current) {
+                remoteVideoRef.current.current.srcObject = remoteStream;
+              }
+            },
           });
+
+          // Re-apply last garment if reconnecting
+          if (rtClient && garmentBlobRef.current && lastPromptRef.current) {
+            rtClient.setImage(garmentBlobRef.current, {
+              prompt: lastPromptRef.current,
+              enhance: false,
+            });
+          }
+        } finally {
+          connectingRef.current = false;
         }
       })();
     } else if (!personPresent && clientRef.current && !connectingRef.current) {
@@ -95,6 +99,9 @@ export default function FullFeaturedPage() {
   useEffect(() => {
     return () => {
       disconnect();
+      if (uploadedImageRef.current) {
+        URL.revokeObjectURL(uploadedImageRef.current);
+      }
     };
   }, [disconnect]);
 
@@ -107,16 +114,20 @@ export default function FullFeaturedPage() {
       if (!clientRef.current) return;
 
       setProcessingStatus(`Generating try-on prompt for ${label}...`);
-      const generatedPrompt = await enhancePrompt(
-        resized,
-        localVideoRef.current
-      );
-      setProcessingStatus(null);
+      let generatedPrompt: string | null = null;
+      try {
+        generatedPrompt = await enhancePrompt(resized, localVideoRef.current);
+      } catch (err) {
+        console.error("Prompt generation failed:", err);
+      } finally {
+        setProcessingStatus(null);
+      }
 
       const finalPrompt = generatedPrompt || "Try on this garment";
       setPrompt(finalPrompt);
       lastPromptRef.current = finalPrompt;
 
+      if (!clientRef.current) return;
       clientRef.current.setImage(resized, {
         prompt: finalPrompt,
         enhance: false,
@@ -140,28 +151,41 @@ export default function FullFeaturedPage() {
     async (file: File) => {
       if (file.size === 0) return;
 
-      // Revoke previous preview URL
-      if (uploadedImage) {
-        URL.revokeObjectURL(uploadedImage);
+      if (uploadedImageRef.current) {
+        URL.revokeObjectURL(uploadedImageRef.current);
       }
 
       const previewUrl = URL.createObjectURL(file);
+      uploadedImageRef.current = previewUrl;
       setUploadedImage(previewUrl);
       setIsUploadActive(true);
       setActiveProduct(null);
 
       await applyGarment(file, "your upload");
     },
-    [applyGarment, uploadedImage]
+    [applyGarment]
   );
 
+  const handleReactivateUpload = useCallback(() => {
+    if (!garmentBlobRef.current || !lastPromptRef.current) return;
+    setIsUploadActive(true);
+    setActiveProduct(null);
+
+    if (!clientRef.current) return;
+    clientRef.current.setImage(garmentBlobRef.current, {
+      prompt: lastPromptRef.current,
+      enhance: false,
+    });
+  }, [clientRef]);
+
   const handleClearUpload = useCallback(() => {
-    if (uploadedImage) {
-      URL.revokeObjectURL(uploadedImage);
+    if (uploadedImageRef.current) {
+      URL.revokeObjectURL(uploadedImageRef.current);
+      uploadedImageRef.current = null;
     }
     setUploadedImage(null);
     setIsUploadActive(false);
-  }, [uploadedImage]);
+  }, []);
 
   const handlePromptSubmit = useCallback(() => {
     if (!clientRef.current || !garmentBlobRef.current) return;
@@ -180,6 +204,7 @@ export default function FullFeaturedPage() {
         isUploadActive={isUploadActive}
         onSelectProduct={handleSelectProduct}
         onUploadGarment={handleUploadGarment}
+        onReactivateUpload={handleReactivateUpload}
         onClearUpload={handleClearUpload}
       />
       <CombinedView

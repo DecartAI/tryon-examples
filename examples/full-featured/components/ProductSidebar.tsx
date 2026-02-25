@@ -10,6 +10,7 @@ interface ProductSidebarProps {
   isUploadActive: boolean;
   onSelectProduct: (product: Product) => void;
   onUploadGarment: (file: File) => void;
+  onReactivateUpload: () => void;
   onClearUpload: () => void;
 }
 
@@ -19,6 +20,7 @@ export function ProductSidebar({
   isUploadActive,
   onSelectProduct,
   onUploadGarment,
+  onReactivateUpload,
   onClearUpload,
 }: ProductSidebarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,7 +55,7 @@ export function ProductSidebar({
         {uploadedImage ? (
           <div className="relative">
             <button
-              onClick={() => onUploadGarment(new File([], ""))}
+              onClick={onReactivateUpload}
               className={`w-full rounded-lg overflow-hidden border-2 transition-all ${
                 isUploadActive
                   ? "border-blue-500 ring-2 ring-blue-500/30"
