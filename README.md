@@ -2,12 +2,13 @@
 
 Virtual try-on lets shoppers see how clothing looks on them in real time, using just a webcam. Decart's `lucy_2_rt` model takes a live camera feed and a garment reference image, then streams back video of the person wearing that garment - all through a WebRTC connection with no server-side rendering. This repo provides drop-in examples so you can add try-on to your own app in minutes.
 
-Two production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
+Three production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
 
 | Example | Use case | Integration style |
 |---------|----------|-------------------|
 | [**E-commerce**](examples/ecommerce/) | "Try it on" button on product pages | Simple - hardcoded prompts, modal overlay |
 | [**Standalone**](examples/standalone/) | Dedicated try-on experience | Advanced - AI-generated prompts via LLM |
+| [**Person Detection**](examples/person-detection/) | Kiosks and unattended displays | Auto-connect when a person is in frame via MediaPipe |
 
 ---
 
@@ -21,7 +22,7 @@ Two production-ready Next.js examples that show how to integrate Decart's realti
 export DECART_API_KEY="your-api-key-here"
 ```
 
-> **Note:** Both examples use [client tokens](https://docs.platform.decart.ai/getting-started/client-tokens) - your permanent API key stays on the server, and the browser only receives a short-lived ephemeral token.
+> **Note:** All examples use [client tokens](https://docs.platform.decart.ai/getting-started/client-tokens) - your permanent API key stays on the server, and the browser only receives a short-lived ephemeral token.
 
 ---
 
@@ -200,7 +201,7 @@ Your permanent `DECART_API_KEY` never leaves the server. The browser receives a 
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
-| `OPENAI_API_KEY` | Standalone only | Powers `/api/enhance-prompt` - auto-generates prompts from garment images |
+| `OPENAI_API_KEY` | Standalone & Person Detection | Powers `/api/enhance-prompt` - auto-generates prompts from garment images |
 
 ---
 
