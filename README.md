@@ -8,7 +8,7 @@ Three production-ready Next.js examples that show how to integrate Decart's real
 |---------|----------|-------------------|
 | [**E-commerce**](examples/ecommerce/) | "Try it on" button on product pages | Simple - hardcoded prompts, modal overlay |
 | [**Standalone**](examples/standalone/) | Dedicated try-on experience | Advanced - AI-generated prompts via LLM |
-| [**Person Detection**](examples/person-detection/) | Kiosks and unattended displays | Auto-connect when a person is in frame via MediaPipe |
+| [**Person Detection**](examples/person-detection/) | Kiosks and unattended displays | Auto-connect - only uses credits when someone is in frame |
 
 ---
 
