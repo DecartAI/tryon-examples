@@ -4,6 +4,8 @@
 
 Unlike the [standalone example](../standalone/) which connects immediately on page load, this example only connects when someone is actually standing in front of the camera.
 
+![Person detection demo](detection.gif)
+
 ---
 
 ## Quick start
