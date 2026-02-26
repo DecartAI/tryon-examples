@@ -1,6 +1,6 @@
 # Standalone Virtual Try-On (with AI-generated prompts)
 
-> A dedicated try-on experience with AI-generated prompts. Products on the left, live camera in the center. Click a product and GPT-4o-mini generates the try-on prompt automatically from the garment image and the person's camera frame.
+> A dedicated try-on experience with AI-generated prompts. Products on the left, live camera in the center. Click a product and a vision LLM generates the try-on prompt automatically from the garment image and the person's camera frame. This example uses GPT-4o-mini, but any vision-capable LLM works (Claude, Gemini, etc.). A built-in Decart solution is coming soon.
 
 Unlike the [e-commerce example](../ecommerce/) which uses hardcoded prompts, this example shows how to use the `/api/enhance-prompt` endpoint to generate prompts dynamically - useful when you don't know what garments users will upload.
 
@@ -117,4 +117,4 @@ This example uses Next.js + Tailwind, but the core Decart integration works with
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime connections |
-| `OPENAI_API_KEY` | Yes | Powers `/api/enhance-prompt` for auto-generating prompts |
+| `OPENAI_API_KEY` | Yes | Powers `/api/enhance-prompt` for auto-generating prompts. Can be swapped for any vision-capable LLM. |
