@@ -5,7 +5,14 @@ import { Product } from "@/lib/products";
 import { useCamera } from "@/hooks/useCamera";
 import { useDecartRealtime } from "@/hooks/useDecartRealtime";
 import { usePersonDetection } from "@/hooks/usePersonDetection";
-import { urlToImageBlob, resizeImageBlob } from "@/lib/image-utils";
+import {
+  urlToImageBlob,
+  resizeImageBlob,
+  captureVideoFrame,
+  extractClothing,
+  checkHasPerson,
+  generateExtremePrecision,
+} from "@/lib/image-utils";
 import { enhancePrompt } from "@/lib/enhance-prompt";
 import { ProductSidebar } from "@/components/ProductSidebar";
 import { CombinedView } from "@/components/CombinedView";
@@ -16,6 +23,10 @@ export default function FullFeaturedPage() {
   const [processingStatus, setProcessingStatus] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [isUploadActive, setIsUploadActive] = useState(false);
+  const [autoExtract, setAutoExtract] = useState(false);
+  const [extremePrecision, setExtremePrecision] = useState(false);
+  const [debugSnapshot, setDebugSnapshot] = useState<string | null>(null);
+  const [debugGenerated, setDebugGenerated] = useState<string | null>(null);
 
   const { stream, startCamera, stopCamera } = useCamera();
   const { status, error, connect, disconnect, clientRef } =
@@ -108,32 +119,65 @@ export default function FullFeaturedPage() {
   // Apply garment blob + generate prompt (shared by product select and upload)
   const applyGarment = useCallback(
     async (blob: Blob, label: string) => {
-      const resized = await resizeImageBlob(blob);
-      garmentBlobRef.current = resized;
+      let cleaned = await resizeImageBlob(blob);
 
-      if (!clientRef.current) return;
+      if (!clientRef.current) {
+        garmentBlobRef.current = cleaned;
+        return;
+      }
 
+      // Step 1: Auto-extract clothing if enabled
+      if (autoExtract) {
+        setProcessingStatus("Analyzing image...");
+        const hasPerson = await checkHasPerson(await resizeImageBlob(blob));
+        if (hasPerson) {
+          setProcessingStatus("Extracting clothing from image...");
+          cleaned = await extractClothing(blob);
+        }
+      }
+
+      garmentBlobRef.current = cleaned;
+
+      // Step 2: Generate prompt
       setProcessingStatus(`Generating try-on prompt for ${label}...`);
       let generatedPrompt: string | null = null;
       try {
-        generatedPrompt = await enhancePrompt(resized, localVideoRef.current);
+        generatedPrompt = await enhancePrompt(cleaned, localVideoRef.current);
       } catch (err) {
         console.error("Prompt generation failed:", err);
-      } finally {
-        setProcessingStatus(null);
       }
 
       const finalPrompt = generatedPrompt || "Try on this garment";
       setPrompt(finalPrompt);
       lastPromptRef.current = finalPrompt;
 
+      // Step 3: Extreme precision if enabled
+      let finalImage: Blob = cleaned;
+      if (extremePrecision && localVideoRef.current) {
+        const snapshot = await captureVideoFrame(localVideoRef.current, 1024);
+        if (snapshot) {
+          setDebugSnapshot((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return URL.createObjectURL(snapshot);
+          });
+          setProcessingStatus("Generating high-precision try-on...");
+          finalImage = await generateExtremePrecision(cleaned, snapshot);
+          setDebugGenerated((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return URL.createObjectURL(finalImage);
+          });
+        }
+      }
+
+      setProcessingStatus(null);
+
       if (!clientRef.current) return;
-      clientRef.current.setImage(resized, {
+      clientRef.current.setImage(finalImage, {
         prompt: finalPrompt,
         enhance: false,
       });
     },
-    [clientRef]
+    [clientRef, autoExtract, extremePrecision]
   );
 
   const handleSelectProduct = useCallback(
@@ -206,6 +250,12 @@ export default function FullFeaturedPage() {
         onUploadGarment={handleUploadGarment}
         onReactivateUpload={handleReactivateUpload}
         onClearUpload={handleClearUpload}
+        autoExtract={autoExtract}
+        onAutoExtractChange={setAutoExtract}
+        extremePrecision={extremePrecision}
+        onExtremePrecisionChange={setExtremePrecision}
+        precisionSnapshot={debugSnapshot}
+        precisionGenerated={debugGenerated}
       />
       <CombinedView
         localStream={stream}

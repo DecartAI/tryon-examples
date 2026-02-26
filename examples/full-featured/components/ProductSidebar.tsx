@@ -12,6 +12,12 @@ interface ProductSidebarProps {
   onUploadGarment: (file: File) => void;
   onReactivateUpload: () => void;
   onClearUpload: () => void;
+  autoExtract: boolean;
+  onAutoExtractChange: (value: boolean) => void;
+  extremePrecision: boolean;
+  onExtremePrecisionChange: (value: boolean) => void;
+  precisionSnapshot?: string | null;
+  precisionGenerated?: string | null;
 }
 
 export function ProductSidebar({
@@ -22,6 +28,12 @@ export function ProductSidebar({
   onUploadGarment,
   onReactivateUpload,
   onClearUpload,
+  autoExtract,
+  onAutoExtractChange,
+  extremePrecision,
+  onExtremePrecisionChange,
+  precisionSnapshot,
+  precisionGenerated,
 }: ProductSidebarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -102,6 +114,83 @@ export function ProductSidebar({
               <span className="text-sm">Upload your own garment</span>
             </div>
           </button>
+        )}
+      </div>
+
+      {/* Pipeline toggles */}
+      <div className="p-4 border-b border-gray-800 space-y-2">
+        <button
+          onClick={() => onAutoExtractChange(!autoExtract)}
+          className="w-full flex items-center justify-between rounded-lg px-3 py-2.5 hover:bg-gray-800 transition-colors"
+        >
+          <div className="text-left">
+            <span className="text-sm font-medium text-white block">
+              Extract clothing
+            </span>
+            <span className="text-xs text-gray-500">
+              Isolate garments from model photos
+            </span>
+          </div>
+          <div
+            className={`w-10 h-6 rounded-full transition-colors relative shrink-0 ml-3 ${
+              autoExtract ? "bg-blue-500" : "bg-gray-600"
+            }`}
+          >
+            <div
+              className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${
+                autoExtract ? "left-[18px]" : "left-0.5"
+              }`}
+            />
+          </div>
+        </button>
+        <button
+          onClick={() => onExtremePrecisionChange(!extremePrecision)}
+          className="w-full flex items-center justify-between rounded-lg px-3 py-2.5 hover:bg-gray-800 transition-colors"
+        >
+          <div className="text-left">
+            <span className="text-sm font-medium text-white block">
+              Extreme precision
+            </span>
+            <span className="text-xs text-gray-500">
+              Better results for bags, accessories & more
+            </span>
+          </div>
+          <div
+            className={`w-10 h-6 rounded-full transition-colors relative shrink-0 ml-3 ${
+              extremePrecision ? "bg-blue-500" : "bg-gray-600"
+            }`}
+          >
+            <div
+              className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${
+                extremePrecision ? "left-[18px]" : "left-0.5"
+              }`}
+            />
+          </div>
+        </button>
+        {/* Precision preview thumbnails */}
+        {(precisionSnapshot || precisionGenerated) && (
+          <div className="flex gap-2 mt-2">
+            {precisionSnapshot && (
+              <div className="flex-1 min-w-0">
+                <p className="text-gray-500 text-[10px] mb-1">Snapshot</p>
+                <img
+                  src={precisionSnapshot}
+                  alt="Camera snapshot"
+                  className="w-full rounded-lg border border-gray-700"
+                />
+              </div>
+            )}
+            {precisionGenerated && (
+              <div className="flex-1 min-w-0">
+                <p className="text-gray-500 text-[10px] mb-1">Generated</p>
+                <img
+                  src={precisionGenerated}
+                  alt="Generated try-on"
+                  className="w-full rounded-lg border border-gray-700"
+                />
+              </div>
+            )}
+          </div>
         )}
       </div>
 
