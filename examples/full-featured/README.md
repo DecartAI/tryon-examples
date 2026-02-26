@@ -69,7 +69,7 @@ Page loads
 | Feature | Description |
 |---------|-------------|
 | **Person detection** | Auto-connects when someone is in frame, disconnects when they leave (saves credits) |
-| **AI-generated prompts** | GPT-4o-mini generates descriptive try-on prompts from the garment image + camera frame |
+| **AI-generated prompts** | Generates descriptive try-on prompts from the garment image + camera frame. This example uses GPT-4o-mini, but any vision-capable LLM works (Claude, Gemini, etc.). A built-in Decart prompt generation API is coming soon. |
 | **File upload** | Users can upload their own garment images and get AI-generated prompts automatically |
 | **Product catalog** | Sidebar with product grid, click to try on |
 | **Editable prompts** | View and edit the generated prompt, re-apply with one click |
@@ -123,4 +123,4 @@ Place the garment image in `public/products/`.
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
-| `OPENAI_API_KEY` | Yes | Powers `/api/enhance-prompt` for auto-generating prompts |
+| `OPENAI_API_KEY` | Yes | Powers `/api/enhance-prompt` for auto-generating prompts. Can be swapped for any vision-capable LLM. |
