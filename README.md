@@ -9,7 +9,7 @@ Four production-ready Next.js examples that show how to integrate Decart's realt
 | [**E-commerce**](examples/ecommerce/) | "Try it on" button on product pages | Simple - hardcoded prompts, modal overlay |
 | [**Standalone**](examples/standalone/) | Dedicated try-on experience | Advanced - AI-generated prompts via LLM |
 | [**Person Detection**](examples/person-detection/) | Kiosks and unattended displays | Auto-connect - only uses credits when someone is in frame |
-| [**Full-Featured**](examples/full-featured/) | Complete try-on experience | All features - person detection, AI prompts, file upload |
+| [**Full-Featured**](examples/full-featured/) | Complete try-on experience | All features - person detection, AI prompts, file upload, clothing extraction, extreme precision |
 
 ---
 
@@ -142,7 +142,7 @@ This is a good fallback, but for the best results we still recommend writing det
 
 ### Generating prompts with an LLM
 
-For garments where you don't have a pre-written prompt (e.g. user-uploaded images), you can use any vision LLM to auto-generate one from the garment image. The [standalone example](examples/standalone/) demonstrates this using OpenAI's GPT-4o-mini, but any vision-capable LLM works (Claude, Gemini, etc.). A built-in Decart solution is coming soon.
+For garments where you don't have a pre-written prompt (e.g. user-uploaded images), you can use any vision LLM to auto-generate one from the garment image. The [standalone example](examples/standalone/) demonstrates this using OpenAI's GPT-4o-mini, but any vision-capable LLM works (Claude, Gemini, etc.). A built-in Decart solution for prompt generation is coming soon.
 
 The example sends both the garment image and a camera frame of the person to `/api/enhance-prompt`:
 
@@ -160,6 +160,43 @@ const { prompt } = await res.json();
 ```
 
 The person frame gives the LLM context about what the person is currently wearing, so it generates more accurate prompts (e.g. "Substitute the grey sweater" instead of generic "Substitute the current top").
+
+### Extracting clothing from model photos
+
+When users upload photos from fashion websites where a model is wearing the garment, the image contains a person + background rather than a clean garment shot. You can use any image editing model to strip the person and background, leaving only the clothing item on a white background — ready for try-on.
+
+The [full-featured example](examples/full-featured/) demonstrates this using FAL.AI's Flux Klein 4B with an extraction prompt, but any image editing model works. A built-in Decart solution is coming soon.
+
+```typescript
+const result = await fal.subscribe("fal-ai/flux-2/klein/4b/base/edit", {
+  input: {
+    prompt: "Extract only the clothing garment from this image...",
+    image_urls: [imageUrl],
+  },
+});
+```
+
+The example also uses GPT-4o-mini to auto-detect whether the uploaded image contains a person, so extraction only runs when needed.
+
+### Extreme precision for non-trivial items
+
+For accessories, bags, hats, jewelry, or other items where the standard real-time model may struggle, you can add a pre-generation step that produces a photorealistic try-on image before sending it to Decart's real-time model. This gives the model a much clearer reference.
+
+The [full-featured example](examples/full-featured/) demonstrates this using FAL.AI's Flux Klein 9B with a virtual try-on LoRA, but any image generation model works. A built-in Decart solution is coming soon.
+
+```typescript
+const result = await fal.subscribe("fal-ai/flux-2/klein/9b/base/edit/lora", {
+  input: {
+    prompt: "TRYON [person in photo]. Replace the outfit with [garment]...",
+    image_urls: [personUrl, clothingUrl],
+    loras: [{ path: LORA_URL, scale: 1.0 }],
+    guidance_scale: 2.5,
+    num_inference_steps: 28,
+  },
+});
+```
+
+The pipeline captures a snapshot from the camera, generates the precision image, then sends that to `setImage()` instead of the raw garment.
 
 ---
 
@@ -190,6 +227,8 @@ The person frame gives the LLM context about what the person is currently wearin
 │                                                  │
 │  /api/tokens          → Decart SDK tokens.create │
 │  /api/enhance-prompt  → OpenAI GPT-4o-mini       │
+│  /api/extract-clothing→ FAL.AI Flux Klein 4B     │
+│  /api/extreme-precision→ FAL.AI Flux Klein 9B    │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -203,6 +242,7 @@ Your permanent `DECART_API_KEY` never leaves the server. The browser receives a 
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
 | `OPENAI_API_KEY` | Standalone / Full-Featured | Powers `/api/enhance-prompt` - auto-generates prompts from garment images. Can be swapped for any vision-capable LLM. |
+| `FAL_KEY` | Full-Featured (optional) | Powers clothing extraction and extreme precision via FAL.AI. Can be swapped for any image editing/generation model. |
 
 ---
 
