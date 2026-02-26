@@ -69,7 +69,7 @@ Page loads
 | Feature | Description |
 |---------|-------------|
 | **Person detection** | Auto-connects when someone is in frame, disconnects when they leave (saves credits) |
-| **AI-generated prompts** | Generates descriptive try-on prompts from the garment image + camera frame. This example uses GPT-4o-mini, but any vision-capable LLM works (Claude, Gemini, etc.). A built-in Decart prompt generation API is coming soon. |
+| **AI-generated prompts** | Generates descriptive try-on prompts from the garment image + camera frame. This example uses GPT-4o-mini, but any vision-capable LLM works (Claude, Gemini, etc.). A built-in Decart solution is coming soon. |
 | **File upload** | Users can upload their own garment images and get AI-generated prompts automatically |
 | **Product catalog** | Sidebar with product grid, click to try on |
 | **Editable prompts** | View and edit the generated prompt, re-apply with one click |
