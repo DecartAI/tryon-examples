@@ -142,7 +142,7 @@ This is a good fallback, but for the best results we still recommend writing det
 
 ### Generating prompts with an LLM
 
-For garments where you don't have a pre-written prompt (e.g. user-uploaded images), you can use any vision LLM to auto-generate one from the garment image. The [standalone example](examples/standalone/) demonstrates this using OpenAI's GPT-4o-mini, but any vision-capable LLM works.
+For garments where you don't have a pre-written prompt (e.g. user-uploaded images), you can use any vision LLM to auto-generate one from the garment image. The [standalone example](examples/standalone/) demonstrates this using OpenAI's GPT-4o-mini, but any vision-capable LLM works (Claude, Gemini, etc.). A built-in Decart solution is coming soon.
 
 The example sends both the garment image and a camera frame of the person to `/api/enhance-prompt`:
 
@@ -202,7 +202,7 @@ Your permanent `DECART_API_KEY` never leaves the server. The browser receives a 
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
-| `OPENAI_API_KEY` | Standalone only | Powers `/api/enhance-prompt` - auto-generates prompts from garment images |
+| `OPENAI_API_KEY` | Standalone / Full-Featured | Powers `/api/enhance-prompt` - auto-generates prompts from garment images. Can be swapped for any vision-capable LLM. |
 
 ---
 
