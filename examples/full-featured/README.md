@@ -4,6 +4,8 @@
 
 Auto-detects when a person is in the camera frame, generates try-on prompts with GPT-4o-mini, lets users upload their own garment images, and includes a product catalog sidebar — all in one app.
 
+![Full-featured example](screenshot.png)
+
 ---
 
 ## Quick start
