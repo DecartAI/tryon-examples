@@ -8,6 +8,7 @@ import { usePersonDetection } from "@/hooks/usePersonDetection";
 import {
   urlToImageBlob,
   resizeImageBlob,
+  captureVideoFrame,
   extractClothing,
   checkHasPerson,
   generateExtremePrecision,
@@ -115,32 +116,6 @@ export default function FullFeaturedPage() {
     };
   }, [disconnect]);
 
-  // Capture full-res snapshot from camera stream
-  const captureSnapshot = useCallback(async (): Promise<Blob | null> => {
-    if (!stream) return null;
-    const video = document.createElement("video");
-    video.srcObject = stream;
-    video.muted = true;
-    video.playsInline = true;
-    await video.play();
-    await new Promise((r) => requestAnimationFrame(r));
-    if (!video.videoWidth) {
-      video.pause();
-      video.srcObject = null;
-      return null;
-    }
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d")!;
-    ctx.drawImage(video, 0, 0);
-    video.pause();
-    video.srcObject = null;
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.9);
-    });
-  }, [stream]);
-
   // Apply garment blob + generate prompt (shared by product select and upload)
   const applyGarment = useCallback(
     async (blob: Blob, label: string) => {
@@ -178,8 +153,8 @@ export default function FullFeaturedPage() {
 
       // Step 3: Extreme precision if enabled
       let finalImage: Blob = cleaned;
-      if (extremePrecision) {
-        const snapshot = await captureSnapshot();
+      if (extremePrecision && localVideoRef.current) {
+        const snapshot = await captureVideoFrame(localVideoRef.current, 1024);
         if (snapshot) {
           setDebugSnapshot((prev) => {
             if (prev) URL.revokeObjectURL(prev);
@@ -202,7 +177,7 @@ export default function FullFeaturedPage() {
         enhance: false,
       });
     },
-    [clientRef, autoExtract, extremePrecision, captureSnapshot]
+    [clientRef, autoExtract, extremePrecision]
   );
 
   const handleSelectProduct = useCallback(
