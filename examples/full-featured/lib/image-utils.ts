@@ -71,6 +71,48 @@ export function captureVideoFrame(
   });
 }
 
+export async function extractClothing(imageBlob: Blob): Promise<Blob> {
+  const formData = new FormData();
+  formData.append("image", imageBlob);
+  const res = await fetch("/api/extract-clothing", {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) {
+    throw new Error(`Clothing extraction failed: ${res.status}`);
+  }
+  return res.blob();
+}
+
+export async function generateExtremePrecision(
+  clothingBlob: Blob,
+  personBlob: Blob
+): Promise<Blob> {
+  const formData = new FormData();
+  formData.append("clothing", clothingBlob);
+  formData.append("person", personBlob);
+  const res = await fetch("/api/extreme-precision", {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) {
+    throw new Error(`Extreme precision generation failed: ${res.status}`);
+  }
+  return res.blob();
+}
+
+export async function checkHasPerson(imageBlob: Blob): Promise<boolean> {
+  const formData = new FormData();
+  formData.append("image", imageBlob);
+  const res = await fetch("/api/check-person", {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) return true;
+  const data = await res.json();
+  return data.hasPerson;
+}
+
 export function loadImage(blob: Blob): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
