@@ -2,7 +2,7 @@
 
 A digital mirror setup where a **display screen** shows the camera feed + AI output with a QR code, and a **phone** scans the QR to browse and select products. The display only connects to Decart when a phone is active, so no credits are used while idle.
 
-Only requires `DECART_API_KEY` — no OpenAI, no database, no external services.
+Only requires `DECART_API_KEY`.
 
 ## Quick start
 
