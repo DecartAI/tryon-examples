@@ -2,7 +2,7 @@
 
 Virtual try-on lets shoppers see how clothing looks on them in real time, using just a webcam. Decart's `lucy_2_rt` model takes a live camera feed and a garment reference image, then streams back video of the person wearing that garment - all through a WebRTC connection with no server-side rendering. This repo provides drop-in examples so you can add try-on to your own app in minutes.
 
-Four production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
+Five production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
 
 | Example | Use case | Integration style |
 |---------|----------|-------------------|
@@ -10,6 +10,7 @@ Four production-ready Next.js examples that show how to integrate Decart's realt
 | [**Standalone**](examples/standalone/) | Dedicated try-on experience | Advanced - AI-generated prompts via LLM |
 | [**Person Detection**](examples/person-detection/) | Kiosks and unattended displays | Auto-connect - only uses credits when someone is in frame |
 | [**Full-Featured**](examples/full-featured/) | Complete try-on experience | All features - person detection, AI prompts, file upload, clothing extraction, extreme precision |
+| [**Digital Mirror**](examples/digital-mirror/) | In-store kiosk / smart mirror | Two-device - display + phone controller via QR code, portrait cropping for vertical screens |
 
 ---
 
@@ -197,6 +198,10 @@ const result = await fal.subscribe("fal-ai/flux-2/klein/9b/base/edit/lora", {
 ```
 
 The pipeline captures a snapshot from the camera, generates the precision image, then sends that to `setImage()` instead of the raw garment.
+
+### Portrait cropping for vertical displays
+
+When using a vertical/portrait display (common in digital mirrors and kiosks), webcams still output landscape video (1280×720). The [digital mirror example](examples/digital-mirror/) demonstrates how to crop the camera feed to portrait (720×1280) using an off-screen canvas before sending it to Decart, so the AI output matches the display orientation.
 
 ---
 
