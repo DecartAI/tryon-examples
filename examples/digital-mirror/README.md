@@ -1,38 +1,57 @@
-# Digital Mirror — Two-Device Virtual Try-On
+# Digital Mirror Virtual Try-On
 
-A digital mirror setup where a **display screen** shows the camera feed + AI output with a QR code, and a **phone** scans the QR to browse and select products. The display only connects to Decart when a phone is active, so no credits are used while idle.
+> Two-device setup: a display screen shows the camera feed + AI output with a QR code, and a phone scans the QR to browse and select products. Only connects to Decart when a phone is active — no credits used while idle.
 
-Only requires `DECART_API_KEY`.
+A digital mirror for in-store kiosks or smart mirrors. The display creates a session and shows a QR code. A customer scans it with their phone, browses a product grid, and taps to try on. The display picks up the selection and streams the AI try-on result. Includes portrait cropping for vertical screens.
+
+---
 
 ## Quick start
+
+### 1. Install dependencies
 
 ```bash
 cd examples/digital-mirror
 npm install
+```
 
-# Set your API key
-export DECART_API_KEY="your-api-key-here"
+### 2. Set your API key
 
+```bash
+cp .env.example .env.local
+```
+
+Open `.env.local` and add your Decart API key:
+
+```env
+DECART_API_KEY=sk_your_key_here
+```
+
+> **Tip:** Get your API key from [platform.decart.ai](https://platform.decart.ai). See the [Authentication guide](https://docs.platform.decart.ai/getting-started/authentication) for details.
+
+### 3. Start the dev server
+
+```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) on the display screen. Scan the QR code with your phone (or open `/remote/XXXXXX` in another browser tab).
 
+---
+
 ## How it works
 
 ```
-┌─────────────────────────────────┐     ┌──────────────────────┐
-│  Display (/)                    │     │  Phone (/remote/XXX) │
-│                                 │     │                      │
-│  1. Start camera                │     │  3. Scan QR code     │
-│  2. Create session → QR code    │     │  4. Claim session    │
-│  5. Poll /api/mirror/poll ◄─────┼─────┤  6. Browse products  │
-│  7. Phone connects → fetch token│     │  7. Tap product      │
-│  8. Connect Decart realtime     │     │     → POST /select   │
-│  9. Get selection → setImage()  │     │  8. Heartbeat /ping  │
-│ 10. Show AI try-on video        │     │  9. Done → /release  │
-│ 11. Phone leaves → disconnect   │     │                      │
-└─────────────────────────────────┘     └──────────────────────┘
+Page loads (display)
+  → Camera starts (getUserMedia, environment-facing)
+    → Portrait stream created (landscape 1280×720 → portrait 720×1280)
+      → Session created → QR code rendered
+        → Phone scans QR → claims session
+          → Display detects controller → fetch client token
+            → Connect to Decart's lucy_2_rt model (WebRTC)
+              → Phone taps product → display polls → setImage(garment, prompt)
+                → AI video stream shows the person wearing the garment
+              → Phone taps "Done" or leaves → disconnect (stops billing)
 ```
 
 **Session lifecycle:**
@@ -45,17 +64,27 @@ Open [http://localhost:3000](http://localhost:3000) on the display screen. Scan 
 
 All session state is stored in-memory on the server (no database needed). Sessions expire after 30 minutes of inactivity.
 
+---
+
+## Key files
+
+| File | Purpose |
+|------|---------|
+| `app/page.tsx` | Display page — camera, portrait stream, Decart connection, QR code, polling for selections |
+| `app/remote/[sessionId]/page.tsx` | Phone controller — session claiming, product grid, heartbeat, release |
+| `hooks/usePortraitStream.ts` | Crops landscape camera to portrait via off-screen canvas + `captureStream()` |
+| `hooks/useMirrorCamera.ts` | Environment-facing camera with fallback to any camera |
+| `hooks/useDecartRealtime.ts` | Decart WebRTC connection management |
+| `lib/mirror-store.ts` | In-memory session store (sessions, controllers, selections) |
+| `lib/products.ts` | Product catalog with hardcoded prompts |
+| `app/api/mirror/*/route.ts` | 6 API routes: session, claim, poll, select, ping, release |
+| `app/api/tokens/route.ts` | Server-side Decart client token creation |
+
+---
+
 ## Portrait cropping for vertical screens
 
-Digital mirrors typically use portrait-oriented displays (vertical screens), but webcams output landscape video (1280×720). This example includes a **portrait cropping hook** that transforms the camera feed before sending it to Decart.
-
-### Why
-
-The Decart realtime model processes whatever resolution you send it. If you send landscape 1280×720 to a portrait display, you either get black bars or a stretched image. By cropping to portrait (720×1280) on the client side, the model's output matches the display orientation.
-
-### How it works
-
-The `usePortraitStream` hook:
+Digital mirrors typically use portrait-oriented displays (vertical screens), but webcams output landscape video (1280×720). The `usePortraitStream` hook transforms the camera feed before sending it to Decart:
 
 1. Creates an off-screen `<canvas>` at 720×1280 (portrait)
 2. Creates a hidden `<video>` element playing the camera stream
@@ -63,7 +92,7 @@ The `usePortraitStream` hook:
 4. Calls `canvas.captureStream(20)` to produce a new `MediaStream`
 5. This portrait stream is sent to Decart instead of the raw camera stream
 
-### The math
+**The math:**
 
 ```
 Camera: 1280×720 (landscape, aspect ratio 1.78)
@@ -80,39 +109,49 @@ Since camera aspect (1.78) > output aspect (0.5625):
 Result: A 405×720 center strip from the camera, scaled to 720×1280
 ```
 
-### Skip portrait cropping
+Add `?landscape` to skip cropping and send the raw camera stream.
 
-Add `?landscape` to the mirror URL to skip cropping and send the raw camera stream:
+---
 
-```
-http://localhost:3000?landscape
-```
+## Customization
 
-## Query parameters
+### Query parameters
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `?flip=false` | `true` (mirrored) | Disable horizontal flip |
 | `?landscape` | portrait crop | Skip portrait cropping, send raw landscape stream |
 
-## Customization
+### Add your own products
 
-### Adding products
+Edit `lib/products.ts`. Each product needs an `id`, `name`, `image` path, and `prompt`:
 
-Edit `lib/products.ts` — each product needs an `id`, `name`, `image` path, and a `prompt`. The prompt is sent directly to the Decart model with `enhance: false`, so write detailed prompts for best results.
+```typescript
+{
+  id: "striped-polo",
+  name: "Striped Polo",
+  image: "/products/striped-polo.jpg",
+  prompt: "Substitute the current top with a navy and white striped polo shirt with a slim fit",
+  price: 45,
+}
+```
+
+Place the garment image in `public/products/`. Prompts are sent directly to the model with `enhance: false`, so write detailed prompts for best results.
+
+---
 
 ## Advanced
 
-This example is intentionally simplified to focus on the two-device mirror pattern. Here are things you'd want to add for a production deployment.
+This example is intentionally simplified to focus on the two-device mirror pattern. For production you'd likely want:
 
-### Database-backed sessions
+- **Database-backed sessions** — The in-memory store (`lib/mirror-store.ts`) resets on server restart and doesn't work across multiple instances. Swap the Maps with Postgres, Redis, or any key-value store. The interface is minimal so the migration is straightforward.
+- **Image uploads and custom prompts** — Let users upload their own garment photos or enter free-text style prompts from the phone. Requires an image upload endpoint (e.g. S3 or Vercel Blob) and extended selection types.
+- **Recording and sharing** — Capture snapshots or short video clips of the try-on result and let users share via email, SMS, or QR code.
 
-Session state is stored in-memory (`lib/mirror-store.ts`), which means it resets on server restart and doesn't work across multiple server instances. For production, swap the in-memory Maps with a real database — Postgres (e.g. Neon), Redis, or any key-value store. The interface is minimal (`createSession`, `claimController`, `setSelection`, etc.) so the migration is straightforward. See the [tryonv1 repo](https://github.com/DecartAI/tryonv1) for a Neon Postgres implementation with the same session/controller/selection schema.
+---
 
-### Image uploads and custom prompts
+## Environment variables
 
-The phone controller only shows the product grid. A production version could allow users to upload their own garment photos or enter free-text style prompts. This requires an image upload endpoint (e.g. to S3 or Vercel Blob) and extended selection types beyond simple product IDs.
-
-### Recording and sharing
-
-A production mirror could capture snapshots or short video clips of the try-on result and let users share them via email, SMS, or QR code. This involves capturing frames from the remote video stream and storing them for later retrieval.
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
