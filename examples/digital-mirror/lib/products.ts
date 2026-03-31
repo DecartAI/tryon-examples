@@ -96,16 +96,3 @@ export const PRODUCTS: Product[] = [
 export function getProductById(id: string): Product | undefined {
   return PRODUCTS.find((p) => p.id === id);
 }
-
-/**
- * Rotation items are the subset of products to cycle through when the mirror
- * is idle (no phone controller connected). Each item must have a hardcoded prompt
- * so the rotation can apply them instantly without calling an LLM.
- */
-export const ROTATION_ITEMS: Product[] = [
-  PRODUCTS[0], // Beanie
-  PRODUCTS[1], // Bomber
-  PRODUCTS[4], // Hoodie
-  PRODUCTS[7], // Zip-Up
-  PRODUCTS[8], // Rain Jacket
-].filter(Boolean);
