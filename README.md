@@ -10,7 +10,7 @@ Seven production-ready Next.js examples that show how to integrate Decart's real
 | [**Standalone**](examples/standalone/) | Dedicated try-on experience | Advanced - AI-generated prompts via LLM |
 | [**Person Detection**](examples/person-detection/) | Kiosks and unattended displays | Auto-connect - only uses credits when someone is in frame |
 | [**Full-Featured**](examples/full-featured/) | Complete try-on experience | All features - person detection, AI prompts, file upload, clothing extraction, extreme precision |
-| [**Digital Mirror**](examples/digital-mirror/) | In-store kiosk / smart mirror | Two-device - display + phone controller via QR code, portrait cropping, idle rotation |
+| [**Digital Mirror**](examples/digital-mirror/) | In-store kiosk / smart mirror | Two-device - display + phone controller via QR code, portrait cropping for vertical screens |
 | [**Outfit Builder**](examples/outfit-builder/) | Multi-garment styling | Composition - combine top + bottom garments, outfit prompt generation, fit validation |
 | [**Batch Warmup**](examples/batch-warmup/) | Demos, presentations, showrooms | Pre-generation - batch FAL queue for instant try-on, cached gallery |
 
