@@ -2,7 +2,7 @@
 
 Virtual try-on lets shoppers see how clothing looks on them in real time, using just a webcam. Decart's `lucy_2_rt` model takes a live camera feed and a garment reference image, then streams back video of the person wearing that garment - all through a WebRTC connection with no server-side rendering. This repo provides drop-in examples so you can add try-on to your own app in minutes.
 
-Seven production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
+Six production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
 
 | Example | Use case | Integration style |
 |---------|----------|-------------------|
@@ -12,7 +12,6 @@ Seven production-ready Next.js examples that show how to integrate Decart's real
 | [**Full-Featured**](examples/full-featured/) | Complete try-on experience | All features - person detection, AI prompts, file upload, clothing extraction, extreme precision |
 | [**Digital Mirror**](examples/digital-mirror/) | In-store kiosk / smart mirror | Two-device - display + phone controller via QR code, portrait cropping for vertical screens |
 | [**Outfit Builder**](examples/outfit-builder/) | Multi-garment styling | Composition - combine top + bottom garments, outfit prompt generation, fit validation |
-| [**Batch Warmup**](examples/batch-warmup/) | Demos, presentations, showrooms | Pre-generation - batch FAL queue for instant try-on, cached gallery |
 
 ---
 
@@ -238,8 +237,6 @@ When using a vertical/portrait display (common in digital mirrors and kiosks), w
 │  /api/extreme-precision→ FAL.AI Flux Klein 9B    │
 │  /api/outfit-prompt   → OpenAI GPT-4o-mini       │
 │  /api/validate-fit    → OpenAI GPT-4o            │
-│  /api/warmup/submit   → FAL.AI Nano Banana Pro   │
-│  /api/warmup/result   → FAL.AI queue polling     │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -252,8 +249,8 @@ Your permanent `DECART_API_KEY` never leaves the server. The browser receives a 
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `DECART_API_KEY` | Yes | Creates client tokens for realtime WebRTC connections |
-| `OPENAI_API_KEY` | Standalone / Full-Featured / Outfit Builder / Batch Warmup | Powers `/api/enhance-prompt` - auto-generates prompts from garment images. Can be swapped for any vision-capable LLM. |
-| `FAL_KEY` | Full-Featured (optional) / Batch Warmup | Powers clothing extraction, extreme precision, and batch warmup via FAL.AI. Can be swapped for any image editing/generation model. |
+| `OPENAI_API_KEY` | Standalone / Full-Featured / Outfit Builder | Powers `/api/enhance-prompt` - auto-generates prompts from garment images. Can be swapped for any vision-capable LLM. |
+| `FAL_KEY` | Full-Featured (optional) | Powers clothing extraction and extreme precision via FAL.AI. Can be swapped for any image editing/generation model. |
 
 ---
 
