@@ -25,12 +25,6 @@ Example: "Substitute the current top with a navy cable-knit sweater with a crew 
 
 Keep the total prompt between 20-30 words. Include colors, textures, and patterns. Return only the final prompt, nothing else.`;
 
-interface ChatMessage {
-  type: string;
-  text?: string;
-  image_url?: { url: string; detail: string };
-}
-
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -55,7 +49,11 @@ export async function POST(req: NextRequest) {
     const mimeType = file.type || "image/png";
     const clothingDataUri = `data:${mimeType};base64,${base64}`;
 
-    const userContent: ChatMessage[] = [
+    const userContent: Array<{
+      type: string;
+      text?: string;
+      image_url?: { url: string; detail: string };
+    }> = [
       {
         type: "text",
         text: "Generate a try-on prompt for this clothing item:",
