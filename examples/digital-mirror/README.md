@@ -75,6 +75,7 @@ All session state is stored in-memory on the server (no database needed). Sessio
 | `hooks/usePortraitStream.ts` | Crops landscape camera to portrait via off-screen canvas + `captureStream()` |
 | `hooks/useMirrorCamera.ts` | Environment-facing camera with fallback to any camera |
 | `hooks/useDecartRealtime.ts` | Decart WebRTC connection management |
+| `hooks/useIdleRotation.ts` | Auto-cycles products when no controller is connected |
 | `lib/mirror-store.ts` | In-memory session store (sessions, controllers, selections) |
 | `lib/products.ts` | Product catalog with hardcoded prompts |
 | `app/api/mirror/*/route.ts` | 6 API routes: session, claim, poll, select, ping, release |
@@ -113,6 +114,20 @@ Add `?landscape` to skip cropping and send the raw camera stream.
 
 ---
 
+## Idle rotation
+
+Add `?idle-rotation` to the display URL to auto-cycle through products when no phone controller is connected. The mirror connects to Decart on load and rotates through a configurable subset of products every 8 seconds. When a phone scans the QR and claims the session, rotation stops and the phone takes control. When the phone leaves, rotation resumes.
+
+```
+http://localhost:3000?idle-rotation
+```
+
+Configure which products rotate and the interval in `lib/products.ts` (the `ROTATION_ITEMS` array) and `hooks/useIdleRotation.ts` (the `DEFAULT_INTERVAL` constant). Each rotation item must have a hardcoded `prompt` so it can be applied instantly without an LLM call.
+
+> **Note:** Idle rotation uses Decart credits while active since it maintains a live connection. Without idle rotation, the mirror only connects when a phone is present.
+
+---
+
 ## Customization
 
 ### Query parameters
@@ -121,6 +136,7 @@ Add `?landscape` to skip cropping and send the raw camera stream.
 |-----------|---------|-------------|
 | `?flip=false` | `true` (mirrored) | Disable horizontal flip |
 | `?landscape` | portrait crop | Skip portrait cropping, send raw landscape stream |
+| `?idle-rotation` | off | Auto-cycle through products when no controller is connected |
 
 ### Add your own products
 

@@ -6,6 +6,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useMirrorCamera } from "@/hooks/useMirrorCamera";
 import { usePortraitStream } from "@/hooks/usePortraitStream";
 import { useDecartRealtime } from "@/hooks/useDecartRealtime";
+import { useIdleRotation } from "@/hooks/useIdleRotation";
 import { urlToImageBlob } from "@/lib/image-utils";
 import { getProductById } from "@/lib/products";
 
@@ -16,6 +17,7 @@ function MirrorContent() {
   const searchParams = useSearchParams();
   const shouldFlip = searchParams.get("flip") !== "false";
   const isLandscape = searchParams.get("landscape") !== null;
+  const idleRotationEnabled = searchParams.get("idle-rotation") !== null;
 
   // Camera + portrait stream
   const { stream: cameraStream, requestCamera } = useMirrorCamera();
@@ -38,6 +40,18 @@ function MirrorContent() {
   const lastProcessedRef = useRef<string | null>(null);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Idle rotation: auto-cycle through products when no controller is connected
+  const {
+    isRotating,
+    currentItem: rotationItem,
+    shouldAutoConnect,
+  } = useIdleRotation({
+    enabled: idleRotationEnabled,
+    hasController,
+    isConnected: status === "connected" || status === "generating",
+    clientRef,
+  });
 
   // Fetch a client token
   const fetchToken = useCallback(async (): Promise<string | null> => {
@@ -111,9 +125,10 @@ function MirrorContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
-  // Connect Decart when phone claims; disconnect when it leaves
+  // Connect Decart when phone claims OR when idle rotation is active; disconnect otherwise
   useEffect(() => {
-    if (hasController && streamToSend) {
+    const shouldConnect = (hasController || shouldAutoConnect) && streamToSend;
+    if (shouldConnect) {
       (async () => {
         setIsLoadingModel(true);
         const key = await fetchToken();
@@ -131,14 +146,14 @@ function MirrorContent() {
           });
         }
       })();
-    } else if (!hasController) {
+    } else if (!hasController && !shouldAutoConnect) {
       disconnect();
       setHasRemoteStream(false);
       setCurrentItemId(null);
       lastProcessedRef.current = null;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasController, streamToSend]);
+  }, [hasController, shouldAutoConnect, streamToSend]);
 
   // Auto-reconnect on disconnect/error while controller is connected
   useEffect(() => {
@@ -146,7 +161,7 @@ function MirrorContent() {
       (status === "disconnected" || status === "error") &&
       streamToSend &&
       hasRemoteStream &&
-      hasController
+      (hasController || shouldAutoConnect)
     ) {
       reconnectTimerRef.current = setTimeout(async () => {
         setIsLoadingModel(true);
@@ -355,6 +370,16 @@ function MirrorContent() {
         <div className="absolute bottom-[20px] left-[20px] z-10 flex items-center gap-[6px] bg-black/50 backdrop-blur-md rounded-full px-[12px] py-[6px]">
           <span className="w-[6px] h-[6px] rounded-full bg-emerald-400" />
           <span className="text-white/60 text-[12px]">Phone connected</span>
+        </div>
+      )}
+
+      {/* Idle rotation indicator */}
+      {isRotating && !hasController && rotationItem && (
+        <div className="absolute bottom-[20px] left-[20px] z-10 flex items-center gap-[6px] bg-black/50 backdrop-blur-md rounded-full px-[12px] py-[6px]">
+          <span className="w-[6px] h-[6px] rounded-full bg-blue-400 animate-pulse" />
+          <span className="text-white/60 text-[12px]">
+            Rotating: {rotationItem.name}
+          </span>
         </div>
       )}
     </div>
