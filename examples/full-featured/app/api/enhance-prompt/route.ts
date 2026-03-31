@@ -9,6 +9,7 @@ Identify what the person is currently wearing on their upper body, lower body, h
 
 Step 2 - Examine the reference clothing image:
 Describe it with material, texture, pattern, fit, and colors. Be specific (e.g. "a red plaid flannel shirt with a relaxed fit" not just "a shirt").
+IMPORTANT: Only describe features you can clearly see. Do NOT infer or guess details like zippers, pockets, buttons, closures, or stitching unless they are obviously visible. If you cannot determine the material, use a general term (e.g. "knit", "woven", "fabric") instead of guessing.
 
 Step 3 - Choose the action:
 - If the person is ALREADY WEARING something in the same slot as the reference item (e.g. they wear a t-shirt and the reference is a blouse), use SUBSTITUTE:
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
       },
       {
         type: "image_url",
-        image_url: { url: clothingDataUri, detail: "low" },
+        image_url: { url: clothingDataUri, detail: "auto" },
       },
     ];
 
