@@ -1,6 +1,6 @@
 # Decart Virtual Try-On Examples
 
-Virtual try-on lets shoppers see how clothing looks on them in real time, using just a webcam. Decart's `lucy_2_rt` model takes a live camera feed and a garment reference image, then streams back video of the person wearing that garment - all through a WebRTC connection with no server-side rendering. This repo provides drop-in examples so you can add try-on to your own app in minutes.
+Virtual try-on lets shoppers see how clothing looks on them in real time, using just a webcam. Decart's `lucy-vton-latest` model takes a live camera feed and a garment reference image, then streams back video of the person wearing that garment - all through a WebRTC connection with no server-side rendering. This repo provides drop-in examples so you can add try-on to your own app in minutes.
 
 Six production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
 
@@ -55,7 +55,7 @@ export async function POST() {
 
 ### Step 2: Connect camera to the realtime model
 
-The frontend fetches a token, opens the camera, and establishes a WebRTC connection to `lucy_2_rt`.
+The frontend fetches a token, opens the camera, and establishes a WebRTC connection to `lucy-vton-latest`.
 
 ```typescript
 import { createDecartClient, models } from "@decartai/sdk";
@@ -73,7 +73,7 @@ const stream = await navigator.mediaDevices.getUserMedia({
 const client = createDecartClient({ apiKey });
 
 const rtClient = await client.realtime.connect(stream, {
-  model: models.realtime("lucy_2_rt"),
+  model: models.realtime("lucy-vton-latest"),
   onRemoteStream: (remoteStream) => {
     // Attach the AI-transformed video to a <video> element
     document.getElementById("output").srcObject = remoteStream;
@@ -214,7 +214,7 @@ When using a vertical/portrait display (common in digital mirrors and kiosks), w
 │                                                  │
 │  ┌──────────┐    WebRTC    ┌──────────────────┐ │
 │  │  Camera   │ ──────────► │  Decart SDK      │ │
-│  │  stream   │             │  (lucy_2_rt)     │ │
+│  │  stream   │             │  (lucy-vton-latest)     │ │
 │  └──────────┘             │                  │ │
 │                            │  AI-transformed  │ │
 │  ┌──────────┐    WebRTC    │  video stream    │ │
