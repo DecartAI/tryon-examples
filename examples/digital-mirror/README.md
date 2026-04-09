@@ -48,7 +48,7 @@ Page loads (display)
       → Session created → QR code rendered
         → Phone scans QR → claims session
           → Display detects controller → fetch client token
-            → Connect to Decart's lucy_2_rt model (WebRTC)
+            → Connect to Decart's lucy-vton-latest model (WebRTC)
               → Phone taps product → display polls → setImage(garment, prompt)
                 → AI video stream shows the person wearing the garment
               → Phone taps "Done" or leaves → disconnect (stops billing)

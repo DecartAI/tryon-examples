@@ -48,7 +48,7 @@ Open [http://localhost:3000](http://localhost:3000). Your camera will start auto
 Page loads
   → Camera starts automatically (getUserMedia)
     → Fetch client token from /api/tokens
-      → Connect to Decart's lucy_2_rt model (WebRTC)
+      → Connect to Decart's lucy-vton-latest model (WebRTC)
         → User sees themselves in the live video feed
           → User clicks a product
             → Capture a frame from the camera

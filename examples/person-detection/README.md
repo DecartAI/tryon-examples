@@ -46,7 +46,7 @@ Page loads
       → Every 1s: detectForVideo() checks for body landmarks
         → Person detected (landmarks found)
           → Fetch client token from /api/tokens
-            → Connect to Decart's lucy_2_rt model (WebRTC)
+            → Connect to Decart's lucy-vton-latest model (WebRTC)
               → User clicks a product → garment applied
         → Person leaves (3 consecutive misses, ~3s)
           → Disconnect from Decart (stops billing)

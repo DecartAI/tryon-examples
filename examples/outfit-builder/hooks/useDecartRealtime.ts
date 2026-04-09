@@ -35,7 +35,7 @@ export function useDecartRealtime() {
 
     try {
       const client = createDecartClient({ apiKey });
-      const model = models.realtime("lucy_2_rt");
+      const model = models.realtime("lucy-vton-latest");
 
       const rtClient = await client.realtime.connect(stream, {
         model,

@@ -48,7 +48,7 @@ User clicks "Try On"
   → Modal opens
     → Camera starts (getUserMedia)
       → Fetch client token from /api/tokens
-        → Connect to Decart's lucy_2_rt model (WebRTC)
+        → Connect to Decart's lucy-vton-latest model (WebRTC)
           → Send garment image + prompt via setImage()
             → AI video stream shows the user wearing the garment
               → User closes modal → camera stops, connection disconnects

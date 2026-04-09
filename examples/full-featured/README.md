@@ -51,7 +51,7 @@ Page loads
       → Every 1s: detectForVideo() checks for body landmarks
         → Person detected (landmarks found)
           → Fetch client token from /api/tokens
-            → Connect to Decart's lucy_2_rt model (WebRTC)
+            → Connect to Decart's lucy-vton-latest model (WebRTC)
               → User clicks a product OR uploads a garment image
                 → [If "Extract clothing" ON] Check for person → extract garment via FAL.AI
                 → Capture a frame from the camera
