@@ -2,7 +2,7 @@
 
 > A mobile-first fitting room with hand gesture navigation. Users queue products, enter a full-screen fit room, and browse their queue by raising a hand — right hand for next, left for previous. Products auto-rotate on a timer with sparkle transition effects.
 
-This example combines real-time virtual try-on with MediaPipe pose detection for a hands-free navigation experience. Each product has a hardcoded prompt. For AI-generated prompts, see the [standalone example](../standalone/).
+This example combines real-time virtual try-on with [MediaPipe Pose Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker) for hands-free gesture navigation. No server-side detection needed — MediaPipe runs entirely in the browser using the `pose_landmarker_lite` model with GPU acceleration (CPU fallback). Each product has a hardcoded prompt. For AI-generated prompts, see the [standalone example](../standalone/).
 
 ---
 
@@ -87,7 +87,7 @@ const applyProduct = async (product: Product) => {
 };
 ```
 
-Hand gesture detection uses MediaPipe PoseLandmarker to track wrist position relative to shoulders. When a wrist stays above its shoulder for 1.5 seconds, the corresponding navigation fires.
+Hand gesture detection uses [MediaPipe Pose Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker) (`@mediapipe/tasks-vision`) to track wrist position relative to shoulders. The model runs in the browser via WASM + WebGL. When a wrist stays above its shoulder for 1.5 seconds, the corresponding navigation fires. Detection runs via `requestAnimationFrame` with canvas frame capture for reliable results on mobile.
 
 ---
 
