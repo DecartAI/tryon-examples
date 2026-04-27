@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Product } from "@/lib/products";
 import type { ConnectionStatus } from "@/hooks/useDecartRealtime";
-import MagicOverlay from "./MagicOverlay";
 
 interface FitRoomViewProps {
   localStream: MediaStream | null;
@@ -74,7 +73,7 @@ export function FitRoomView({
 
   const isConnecting = status === "connecting";
   const showSplash = isTransitioning || splashFadingOut;
-  const showMagic = isConnecting || !!processingStatus || isTransitioning || !hasRemoteStream;
+
 
   return (
     <div className="fixed inset-0 bg-black">
@@ -199,8 +198,6 @@ export function FitRoomView({
         </div>
       </div>
 
-      {/* Magic overlay during transitions */}
-      <MagicOverlay visible={showMagic} />
     </div>
   );
 }
