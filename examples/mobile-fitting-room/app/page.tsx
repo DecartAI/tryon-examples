@@ -75,8 +75,8 @@ export default function FittingRoomPage() {
 
   const fetchToken = useCallback(async (): Promise<string> => {
     const res = await fetch("/api/tokens", { method: "POST" });
-    const data = await res.json();
-    return data.token;
+    const { apiKey } = await res.json();
+    return apiKey;
   }, []);
 
   const enterFitRoom = useCallback(async () => {
@@ -93,7 +93,7 @@ export default function FittingRoomPage() {
       await connect({
         apiKey: token,
         stream: cameraStream,
-        ...(firstBlob && { image: firstBlob }),
+        ...(firstBlob && { image: firstBlob, prompt: queue[0].prompt }),
         onRemoteStream: (remoteStream) => {
           if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = remoteStream;
