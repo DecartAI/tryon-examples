@@ -68,7 +68,7 @@ export function useFittingRotation({
     if (isActive && !hasAppliedFirstRef.current && queue.length > 0) {
       hasAppliedFirstRef.current = true;
       setCurrentIndex(0);
-      applyItem(0, true);
+      applyItem(0, false);
     }
   }, [isActive, queue, applyItem]);
 
