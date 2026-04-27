@@ -2,7 +2,7 @@
 
 Virtual try-on lets shoppers see how clothing looks on them in real time, using just a webcam. Decart's `lucy-vton-latest` model takes a live camera feed and a garment reference image, then streams back video of the person wearing that garment - all through a WebRTC connection with no server-side rendering. This repo provides drop-in examples so you can add try-on to your own app in minutes.
 
-Six production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
+Seven production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
 
 | Example | Use case | Integration style |
 |---------|----------|-------------------|
@@ -12,6 +12,7 @@ Six production-ready Next.js examples that show how to integrate Decart's realti
 | [**Full-Featured**](examples/full-featured/) | Complete try-on experience | All features - person detection, AI prompts, file upload, clothing extraction, extreme precision |
 | [**Digital Mirror**](examples/digital-mirror/) | In-store kiosk / smart mirror | Two-device - display + phone controller via QR code, portrait cropping for vertical screens |
 | [**Outfit Builder**](examples/outfit-builder/) | Multi-garment styling | Composition - combine top + bottom garments, outfit prompt generation, fit validation |
+| [**Mobile Fitting Room**](examples/mobile-fitting-room/) | Mobile fitting room | Hands-free - product queue, auto-rotation, hand gesture navigation via MediaPipe Pose |
 
 ---
 
