@@ -93,7 +93,7 @@ export default function FittingRoomPage() {
       await connect({
         apiKey: token,
         stream: cameraStream,
-        ...(firstBlob && { image: firstBlob, prompt: queue[0].prompt }),
+        ...(firstBlob && { image: firstBlob }),
         onRemoteStream: (remoteStream) => {
           if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = remoteStream;
