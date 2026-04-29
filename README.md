@@ -93,7 +93,7 @@ await rtClient.setImage(garmentBlob, {
 });
 ```
 
-Call `setImage()` again at any time to switch garments - no need to reconnect.
+Call `setImage()` again at any time to switch garments - no need to reconnect. For fast switching, resize garment images to a max of 1024px before sending; large images (>1024px) significantly increase switch latency.
 
 ---
 
@@ -107,7 +107,7 @@ The ideal setup is a **clean garment image** paired with a **descriptive prompt*
 
 - **Clean garment images work best** - just the clothing item, no person wearing it
 - **White or clean backgrounds** are ideal
-- **At least 512x512 pixels** - the model reproduces what it sees, so clear garment = better results
+- **512–1024px on the long edge** - the model reproduces what it sees, so clear garment = better results. Images larger than 1024px add latency without improving quality; always resize before calling `setImage()`.
 - If your source image shows a person wearing the garment, consider using an image editing model to extract just the clothing item
 
 **Prompt structure:**
