@@ -8,7 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@decartai/sdk": "^0.0.59",
+    "@decartai/sdk": "https://pkg.pr.new/@decartai/sdk@122",
     "@fal-ai/client": "^1.2.1",
     "@mediapipe/tasks-vision": "^0.10.18",
     "next": "15.1.0",
