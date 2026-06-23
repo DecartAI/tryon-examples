@@ -6,7 +6,7 @@ import { useDecartRealtime } from "@/hooks/useDecartRealtime";
 import { useHandGesture } from "@/hooks/useHandGesture";
 import { useFittingQueue } from "@/hooks/useFittingQueue";
 import { useFittingRotation } from "@/hooks/useFittingRotation";
-import { urlToImageBlob } from "@/lib/image-utils";
+import { urlToImageBlob, resizeImageBlob } from "@/lib/image-utils";
 import { PRODUCTS } from "@/lib/products";
 import type { Product } from "@/lib/products";
 import { ShoppingView } from "@/components/ShoppingView";
@@ -33,7 +33,7 @@ export default function FittingRoomPage() {
       if (!clientRef.current) return;
       setProcessingStatus("Applying...");
       try {
-        const blob = await urlToImageBlob(product.image);
+        const blob = await urlToImageBlob(product.image).then(resizeImageBlob);
         await clientRef.current.setImage(blob, {
           prompt: product.prompt,
           enhance: false,
@@ -86,7 +86,7 @@ export default function FittingRoomPage() {
     const [cameraStream, token, firstBlob] = await Promise.all([
       stream ?? startCamera(),
       fetchToken(),
-      urlToImageBlob(queue[0].image).catch(() => undefined),
+      urlToImageBlob(queue[0].image).then(resizeImageBlob).catch(() => undefined),
     ]);
 
     if (cameraStream && token) {
