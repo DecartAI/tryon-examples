@@ -46,6 +46,11 @@ export function TryOnModal({ product, onClose }: TryOnModalProps) {
       const mediaStream = await startCamera();
       if (!mediaStream || cancelled) return;
 
+      // Show local camera feed immediately so users see themselves while connecting
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+      }
+
       const res = await fetch("/api/tokens", { method: "POST" });
       const { apiKey } = await res.json();
       if (cancelled) return;
