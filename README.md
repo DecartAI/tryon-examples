@@ -2,7 +2,7 @@
 
 Virtual try-on lets shoppers see how clothing looks on them in real time, using just a webcam. Decart's `lucy-vton-latest` model takes a live camera feed and a garment reference image, then streams back video of the person wearing that garment - all through a WebRTC connection with no server-side rendering. This repo provides drop-in examples so you can add try-on to your own app in minutes.
 
-Seven production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
+Eight production-ready Next.js examples that show how to integrate Decart's realtime virtual try-on. Each example is self-contained and runs independently.
 
 | Example | Use case | Integration style |
 |---------|----------|-------------------|
@@ -13,6 +13,7 @@ Seven production-ready Next.js examples that show how to integrate Decart's real
 | [**Digital Mirror**](examples/digital-mirror/) | In-store kiosk / smart mirror | Two-device - display + phone controller via QR code, portrait cropping for vertical screens |
 | [**Outfit Builder**](examples/outfit-builder/) | Multi-garment styling | Composition - combine top + bottom garments, outfit prompt generation, fit validation |
 | [**Mobile Fitting Room**](examples/mobile-fitting-room/) | Mobile | Hands-free - product queue, auto-rotation, hand gesture navigation via MediaPipe Pose |
+| [**Mobile**](examples/mobile/) | Mobile shopper try-on | Simple - two ready-made full outfits with prompts written in advance, SDK connection-quality preflight + in-session warning, pose framing check |
 
 ---
 
@@ -200,6 +201,28 @@ const result = await fal.subscribe("fal-ai/flux-2/klein/9b/base/edit/lora", {
 ```
 
 The pipeline captures a snapshot from the camera, generates the precision image, then sends that to `setImage()` instead of the raw garment.
+
+### Connection quality on mobile
+
+Mobile reception is variable, and a realtime session streams video both ways. The SDK reports network health on a shared `"good" | "fair" | "poor" | "critical"` scale in two places: a **preflight** probe before connecting, and an **in-session** verdict while connected. The [mobile example](examples/mobile/) gates the experience on both.
+
+```typescript
+// Before connecting: network-only reachability check, no session, no cost
+const { quality, metrics, reasons } = await client.realtime.checkConnectivity();
+if (quality === "critical") showFallback(reasons); // metrics.transport: "udp" | "relay" | "failed"
+
+// While connected: smoothed live verdict plus the dimension that is the bottleneck
+const rtClient = await client.realtime.connect(stream, {
+  model,
+  onRemoteStream,
+  onConnectionQuality: ({ quality, limitingFactor }) => {
+    updateSignalBars(quality);
+    if (quality === "poor") warnUser(limitingFactor); // "bandwidth" | "latency" | "loss" | "stall" | "cpu" | "none"
+  },
+});
+```
+
+The SDK reports and you decide what to do: gate the UI, warn, or fall back. See the [Network Requirements](https://docs.platform.decart.ai/integrations/network-requirements) guide for the exact thresholds and the domains and ports to allow.
 
 ### Portrait cropping for vertical displays
 
