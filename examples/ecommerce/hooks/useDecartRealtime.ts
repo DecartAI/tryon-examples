@@ -68,8 +68,12 @@ export function useDecartRealtime() {
     if (clientRef.current) {
       clientRef.current.disconnect();
       clientRef.current = null;
+      setStatus("disconnected");
+    } else {
+      // Nothing was connected yet (e.g. React StrictMode effect cleanup);
+      // keep showing the startup state instead of a misleading "Disconnected".
+      setStatus("idle");
     }
-    setStatus("disconnected");
   }, []);
 
   return { status, error, connect, disconnect, clientRef };

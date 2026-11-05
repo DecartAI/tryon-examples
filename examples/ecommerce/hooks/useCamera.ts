@@ -8,6 +8,14 @@ export function useCamera() {
   const streamRef = useRef<MediaStream | null>(null);
 
   const startCamera = useCallback(async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError(
+        window.isSecureContext
+          ? "Camera is not supported in this browser."
+          : "Camera requires HTTPS. Open this page via https:// or localhost."
+      );
+      return null;
+    }
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         audio: false,

@@ -39,6 +39,17 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). You should see a grid of 6 products. Click "Try On" on any product to open the try-on modal.
 
+### Testing on a phone
+
+Browsers only allow camera access on secure origins (`https://` or `localhost`). Opening `http://<your-lan-ip>:3000` on a phone fails with "Camera requires HTTPS". Use one of these:
+
+- **Android over USB (easiest):** enable USB debugging, then run `adb reverse tcp:3000 tcp:3000` and open `http://localhost:3000` on the phone. Re-run it after you reconnect the cable.
+- **HTTPS dev server:** run `npm run dev:https` (from `examples/ecommerce`) and open `https://<your-lan-ip>:3000`. The certificate is self-signed, so tap through the warning.
+- **Chrome flag (Android only):** add your LAN URL at `chrome://flags/#unsafely-treat-insecure-origin-as-secure`.
+- **Tunnel (works on iOS too):** `npx cloudflared tunnel --url http://localhost:3000` or `ngrok http 3000`.
+
+After you tap Try On, it takes about 10–15 seconds to reach **Live**. The video stays dark while the garment is being applied.
+
 ---
 
 ## How it works
