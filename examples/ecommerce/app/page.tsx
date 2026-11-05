@@ -64,10 +64,11 @@ export default function HomePage() {
           {PRODUCTS.length} products
         </p>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-10">
-          {PRODUCTS.map((product) => (
+          {PRODUCTS.map((product, index) => (
             <ProductCard
               key={product.name}
               product={product}
+              priority={index < 3}
               onTryOn={() => setSelectedProduct(product)}
             />
           ))}
